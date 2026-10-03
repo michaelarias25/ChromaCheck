@@ -16,3 +16,11 @@ export async function crearLote(codigo: string) {
   );
   return resultado.rows[0];
 }
+// Cambia el estado de un lote (ej. a "Pausado" cuando hay una alerta roja)
+export async function actualizarEstadoLote(loteId: number, estado: string) {
+  const resultado = await pool.query(
+    'UPDATE lotes SET estado = $1 WHERE id = $2 RETURNING *',
+    [estado, loteId]
+  );
+  return resultado.rows[0];
+}
