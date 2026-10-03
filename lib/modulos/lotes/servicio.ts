@@ -16,3 +16,25 @@ export async function crearLote(codigo: string) {
   );
   return resultado.rows[0];
 }
+
+// Trae los lotes con su color de muestra y desviación promedio, para la pantalla principal
+export async function obtenerLotesConResumen() {
+  const resultado = await pool.query(`
+    SELECT
+      l.id,
+      l.codigo,
+      l.estado,
+      l.fecha_inicio,
+      (SELECT resultado_hex FROM tarros WHERE lote_id = l.id AND es_muestra = true LIMIT 1) AS muestra_hex,
+      (SELECT ROUND(AVG(desviacion_delta_e), 2) FROM tarros WHERE lote_id = l.id AND es_muestra = false) AS desviacion_promedio
+    FROM lotes l
+    ORDER BY l.fecha_inicio DESC
+  `);
+  return resultado.rows;
+}
+
+// Trae un lote específico por su id
+export async function obtenerLotePorId(id: number) {
+  const resultado = await pool.query('SELECT * FROM lotes WHERE id = $1', [id]);
+  return resultado.rows[0] || null;
+}

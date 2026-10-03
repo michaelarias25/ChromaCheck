@@ -86,3 +86,20 @@ export async function registrarTarro(
   );
   return respuesta.rows[0];
 }
+// Trae todos los tarros con el código de su lote, para el historial general
+export async function obtenerHistorialTarros() {
+  const resultado = await pool.query(`
+    SELECT
+      t.id_tarro,
+      t.resultado_hex,
+      t.desviacion_delta_e,
+      t.resultado,
+      t.timestamp,
+      l.codigo AS lote_codigo
+    FROM tarros t
+    JOIN lotes l ON l.id = t.lote_id
+    WHERE t.es_muestra = false
+    ORDER BY t.timestamp DESC
+  `);
+  return resultado.rows;
+}
