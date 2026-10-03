@@ -2,8 +2,10 @@ import { obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
 import { obtenerTarrosDeLote, obtenerMuestraDeLote } from '@/lib/modulos/tarros/servicio';
 
 // Pantalla de monitoreo: detalle en vivo de un lote específico
-export default async function PaginaLote({ params }: { params: { id: string } }) {
-  const loteId = Number(params.id);
+export default async function PaginaLote({ params,}: { params: Promise<{ id: string }>;}) {
+  const { id } = await params;
+  const loteId = Number(id);
+
   const lote = await obtenerLotePorId(loteId);
   const muestra = await obtenerMuestraDeLote(loteId);
   const tarros = await obtenerTarrosDeLote(loteId);
