@@ -6,10 +6,6 @@ export default async function PaginaHistorial() {
 
   return (
     <main className="min-h-screen bg-surface text-on-surface">
-      <header className="h-16 px-8 flex items-center border-b-2 border-surface-container-highest bg-surface-container-lowest">
-        <span className="font-headline font-bold uppercase tracking-wider">Chroma Check</span>
-      </header>
-
       <section className="max-w-6xl mx-auto px-6 py-10">
         <h1 className="font-headline text-3xl font-bold uppercase mb-8">
           Historial de Calidad de Tarros

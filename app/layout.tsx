@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,35 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <header className="h-16 px-8 flex items-center justify-between border-b-2 border-surface-container-highest bg-surface-container-lowest">
+          
+          <div className="flex items-center h-10 w-auto">
+            <img 
+              src="/logo.png" 
+              alt="Chroma Check Logo" 
+              className="h-full w-auto object-contain" 
+            />
+          </div>
+          
+          <nav className="flex items-center gap-3">
+            <Link 
+              href="/" 
+              className="px-4 h-9 bg-surface-container-high text-on-surface-variant flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider transition hover:bg-surface-container-highest"
+            >
+              Lotes
+            </Link>
+
+            <Link 
+              href="/historial" 
+              className="px-4 h-9 bg-surface-container-high text-on-surface-variant flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider transition hover:opacity-90"
+            >
+              Historial
+            </Link>
+          </nav>
+        </header>
+        {children}
+        </body>
     </html>
   );
 }
