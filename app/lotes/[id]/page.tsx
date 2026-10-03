@@ -10,7 +10,7 @@ export default async function PaginaLote({ params,}: { params: Promise<{ id: str
   const muestra = await obtenerMuestraDeLote(loteId);
   const tarros = await obtenerTarrosDeLote(loteId);
 
-  const lecturasRecientes = tarros.filter((t) => !t.es_muestra).slice(-8).reverse();
+  const lecturasRecientes = tarros.filter((tarro) => !tarro.es_muestra).slice(-8).reverse();
   const ultimoTarro = lecturasRecientes[0];
 
   if (!lote) {
@@ -79,22 +79,22 @@ export default async function PaginaLote({ params,}: { params: Promise<{ id: str
               </tr>
             </thead>
             <tbody>
-              {lecturasRecientes.map((t) => (
-                <tr key={t.id_tarro} className="border-t border-surface-container-highest">
-                  <td className="px-5 py-3">#TR-{t.id_tarro}</td>
-                  <td className="px-5 py-3 font-bold">{t.desviacion_delta_e}</td>
+              {lecturasRecientes.map((tarro) => (
+                <tr key={tarro.id_tarro} className="border-t border-surface-container-highest">
+                  <td className="px-5 py-3">#TR-{tarro.id_tarro}</td>
+                  <td className="px-5 py-3 font-bold">{tarro.desviacion_delta_e}</td>
                   <td className="px-5 py-3">
-                    {new Date(t.timestamp).toLocaleTimeString()}
+                    {new Date(tarro.timestamp).toLocaleTimeString()}
                   </td>
                   <td className="px-5 py-3">
                     <span
                       className={`px-3 py-1 rounded text-xs uppercase font-bold ${
-                        t.resultado === 'Aprobado'
+                        tarro.resultado === 'Aprobado'
                           ? 'bg-secondary-container text-secondary-fixed'
                           : 'bg-primary-container text-on-primary-container'
                       }`}
                     >
-                      {t.resultado}
+                      {tarro.resultado}
                     </span>
                   </td>
                 </tr>

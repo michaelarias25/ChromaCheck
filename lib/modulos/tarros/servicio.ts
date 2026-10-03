@@ -120,14 +120,14 @@ export async function detectarPatronAcumulativo(loteId: number): Promise<boolean
 
   const valores = resultado.rows.map((fila) => Number(fila.desviacion_delta_e)).reverse();
 
-  const vieneAumentando = valores[0] < valores[1] && valores[1] < valores[2];
+  const estaAumentando = valores[0] < valores[1] && valores[1] < valores[2];
   const ultimoExcedeTolerancia = valores[2] > 0.8;
 
-  return vieneAumentando && ultimoExcedeTolerancia;
+  return estaAumentando && ultimoExcedeTolerancia;
 }
 
 // Convierte un color hex (#RRGGBB) a un arreglo RGB
-function hexARgb(hex: string): [number, number, number] {
+function convertirHexARgb(hex: string): [number, number, number] {
   const valor = hex.replace('#', '');
   return [
     parseInt(valor.substring(0, 2), 16),
@@ -147,7 +147,7 @@ export async function registrarLecturaTarro(
     throw new Error('El lote no tiene tarro muestra registrado');
   }
 
-  const rgbMuestra = hexARgb(muestra.resultado_hex);
+  const rgbMuestra = convertirHexARgb(muestra.resultado_hex);
   const desviacionDeltaE = calcularDesviacionDeltaE(rgbMuestra, rgb);
   const excedeTolerancia = excedeToleranciaDeltaE(desviacionDeltaE);
   const resultado = excedeTolerancia ? 'No Aprobado' : 'Aprobado';
