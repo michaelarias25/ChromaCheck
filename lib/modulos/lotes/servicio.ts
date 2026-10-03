@@ -32,3 +32,9 @@ export async function obtenerLotesConResumen() {
   `);
   return resultado.rows;
 }
+
+// Trae un lote específico por su id
+export async function obtenerLotePorId(id: number) {
+  const resultado = await pool.query('SELECT * FROM lotes WHERE id = $1', [id]);
+  return resultado.rows[0] || null;
+}
