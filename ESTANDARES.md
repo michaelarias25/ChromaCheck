@@ -1,6 +1,6 @@
 # Estándares del equipo: ChromaCheck
 
-Universidad Santo Tomás, Facultad de Ingeniería de Sistemas, Gerencia de Software, Grupo N°3
+Universidad Santo Tomás, Facultad de Ingeniería de Sistemas, Gerencia de Software, Grupo N°1
 Docente: Stefany Gómez Riveros. Año 2026.
 
 Proyecto: ChromaCheck, plataforma web de control de calidad e inventario para fábrica de pintura, con un prototipo IoT que mide la desviación de color (ΔE).
