@@ -12,11 +12,11 @@ Vigencia: desde su publicación y durante el resto del semestre.
 
 | Capa | Lenguaje y framework | Formateador y linter |
 |---|---|---|
-| Frontend y backend | Next.js (React), en un solo proyecto, carpeta `ChromaCheck` (antes `myBack`/`myapp`) | Prettier y ESLint |
-| Base de datos | PostgreSQL 17 alojado en Neon, sin Neon Auth | No aplica |
-| Microcontrolador | C++ sobre Arduino, con sensor de color | clang-format (estilo Google) |
+| Frontend y backend | Next.js (React), TypeScript, CSS y Python, en un solo proyecto, carpeta `ChromaCheck` (antes `myBack`/`myapp`) | Prettier y ESLint; PEP 8 para Python |
+| Firmware (Arduino) | C++ sobre Arduino, sensor TCS3200 y PySerial | clang-format (estilo Google) |
+| Base de datos | PostgreSQL 17 alojado en Neon, sin Neon Auth | `snake_case` |
 
-El frontend y el backend conviven en el mismo proyecto Next.js: las pantallas están en la parte de React y los endpoints de la API en las rutas de servidor del mismo proyecto. No hay un servicio aparte.
+El frontend y el backend conviven en el mismo proyecto Next.js: las pantallas están en la parte de React y los endpoints de la API en las rutas de servidor del mismo proyecto. No hay un servicio aparte. Python (PySerial) se usa para la comunicación con el Arduino.
 
 Los archivos de configuración (`.prettierrc`, `eslint.config.mjs` o `.eslintrc.json`, `.clang-format`) viven en el repositorio. Cualquiera puede ejecutar los comandos de la sección 4 y obtener el mismo resultado.
 
@@ -27,12 +27,14 @@ Los archivos de configuración (`.prettierrc`, `eslint.config.mjs` o `.eslintrc.
 ### 1.1 Guías oficiales adoptadas
 
 - Next.js, React, HTML, CSS y JavaScript: reglas de ESLint con la configuración oficial de Next.js (`next/core-web-vitals`) y formato automático con Prettier. Clases CSS en `kebab-case`.
+- Python: PEP 8.
 - C++ y Arduino: [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html), aplicada con clang-format.
+- Base de datos: nombres de tablas y columnas en `snake_case`.
 
 ### 1.2 Idioma del código
 
 Todo en español: nombres de variables, funciones, componentes, comentarios, mensajes de commit y documentación.
-Se admiten sin traducir los términos propios de las tecnologías (`route`, `request`, `commit`, `pull request`, `Next.js`, `setup`, `loop`, nombres de librerías y palabras reservadas del lenguaje). La sigla ΔE se escribe `deltaE` en los identificadores.
+Se admiten sin traducir los términos propios de las tecnologías (`route`, `request`, `commit`, `pull request`, `Next.js`, `setup`, `loop`, nombres de librerías y palabras reservadas del lenguaje o de la base de datos). La sigla ΔE se escribe `deltaE` en los identificadores.
 
 ### 1.3 Formateador configurado
 
@@ -41,10 +43,10 @@ Prettier, ESLint y clang-format, con sus archivos de configuración versionados 
 ### 1.4 Tres reglas propias de nombres
 
 1. Booleano = pregunta sí/no. El nombre se lee como una pregunta que se responde con sí o no. Ejemplos: `esMuestra`, `tieneError`.
-2. Función = empieza con verbo en infinitivo. Ejemplos: `leerSensor`, `guardarLote`.
-3. Unidad dentro del nombre. Toda magnitud lleva su unidad en el nombre. Ejemplo: `desviacionPorcentaje`.
+2. Función = empieza con un verbo. Ejemplos: `leerSensor`, `guardarLote`.
+3. Variables en español. Los nombres de variables van en español (ver 1.2). Ejemplo: `desviacionPorcentaje`.
 
-Además: `camelCase` para variables y funciones, `PascalCase` para componentes de React y clases, y `MAYUSCULAS_CON_GUION_BAJO` para constantes.
+Además: `camelCase` para variables y funciones, `PascalCase` para componentes de React y clases, `MAYUSCULAS_CON_GUION_BAJO` para constantes y `snake_case` en la base de datos.
 
 ---
 
@@ -55,8 +57,10 @@ Además: `camelCase` para variables y funciones, `PascalCase` para componentes d
 Basado en [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/):
 
 ```
-<tipo>: <descripción en infinitivo, minúscula, sin punto final>
+<tipo>(<alcance>): <descripción en imperativo>
 ```
+
+Ejemplo: `feat(tarros): agregar endpoints de registro y consulta de tarros`.
 
 ### 2.2 Tipos permitidos
 
@@ -73,8 +77,9 @@ Cualquier otro tipo es inválido.
 
 ### 2.3 Esquema de ramas
 
-- `main`: siempre estable y entregable. Nadie hace commit directo; solo se actualiza mediante Pull Request aprobado.
-- Ramas de trabajo, creadas desde `main`: `<tipo>/<resumen>` con los mismos tipos de 2.2, en minúscula y con guiones. Ejemplos: `feat/calculo-delta-e`, `fix/reconexion-sensor`, `docs/estandares`.
+- `main` (principal): siempre estable y entregable. Nadie hace commit directo.
+- `development` (para integración): recibe los cambios de las ramas de tarea mediante Pull Request aprobado.
+- `feature/**` (por tareas): una rama por tarea, creada desde `development`. Ejemplos: `feature/calculo-delta-e`, `feature/login-basico`.
 - La rama se elimina después de fusionarse.
 
 ---
@@ -83,12 +88,14 @@ Cualquier otro tipo es inválido.
 
 Una tarjeta del tablero Kanban puede pasar a "En progreso" solo si cumple todas estas condiciones:
 
-1. Tiene un título en infinitivo y una descripción de qué se debe lograr, escrita en la tarjeta de Trello.
-2. Tiene criterios de aceptación escritos como lista de verificación dentro de la tarjeta (mínimo dos).
-3. Indica a qué parte pertenece mediante una etiqueta: `frontend`, `backend`, `firmware` o `bd`.
+1. Cuenta con una descripción de qué se debe lograr.
+2. Tiene criterios de aceptación escritos como checklist.
+3. Indica su etiqueta: Programación, Documentación o Hardware.
 4. Tiene un responsable asignado (Lauren Castro o Michael Arias).
-5. No depende de una tarjeta sin terminar; si depende de otra, la tarjeta bloqueante está enlazada en la descripción.
-6. No contradice las exclusiones del Acta de Constitución (sin contabilidad, sin app móvil nativa, sin integración ERP, sin pasarelas de pago). Si lo hiciera, se rechaza.
+5. No contradice las exclusiones del Acta de Constitución (sin contabilidad, sin app móvil nativa, sin integración ERP, sin pasarelas de pago).
+6. No depende de una tarjeta sin terminar.
+7. El código nuevo sigue las 3 reglas de nombres del equipo (booleano, función, variables en español), verificado por el revisor.
+8. Si requiere modificar una tabla existente, el cambio se prueba primero en el SQL Editor de Neon antes de tocar el código que depende de ella.
 
 ---
 
@@ -98,14 +105,14 @@ Una tarjeta pasa a "Hecho" solo si se cumplen todas las condiciones. Cada una se
 
 | # | Condición | Cómo la verifica un tercero |
 |---|---|---|
-| 1 | El cambio está fusionado en `main` mediante un Pull Request. | En GitHub, el PR aparece como *Merged* y el historial de `main` contiene el cambio. |
+| 1 | El cambio está fusionado en `development` mediante un Pull Request. | En GitHub, el PR aparece como *Merged* y el historial de `development` contiene el cambio. |
 | 2 | El PR tiene al menos una aprobación del otro integrante. | La pestaña *Conversation* del PR muestra el estado *Approved*. |
-| 3 | El formato pasa sin errores: `npx prettier --check .`, `npm run lint` y, si el PR toca firmware, `clang-format --dry-run --Werror` sobre los archivos `.ino`, `.cpp` y `.h`. | Se ejecutan los comandos en un clon limpio y todos terminan con código de salida 0. |
-| 4 | El proyecto compila: `npm run build` termina sin errores. | Se ejecuta el comando en un clon limpio, con las variables de `.env.example` completadas, y termina con código 0. |
-| 5 | Todos los mensajes de commit y el título del PR cumplen la convención de la sección 2. | Se leen en `git log` o en la pestaña *Commits* del PR. |
-| 6 | Si el cambio altera una ruta de la API, el esquema de la base de datos, una conexión del circuito o una variable de entorno, el `README.md` o la carpeta `docs/` se actualizó en el mismo PR. | El PR incluye el diff de `README.md` o `docs/`. |
-| 7 | No hay secretos (contraseñas, cadena de conexión a Neon, credenciales WiFi, tokens) en el código ni en el historial. Los valores sensibles se leen de variables de entorno guardadas en `.env.local`, ignorado por `.gitignore`. | Se busca en el diff del PR; el repositorio contiene `.env.example` sin valores reales y `.gitignore` incluye `.env.local`. |
-| 8 | La tarjeta de Trello tiene enlazado el PR, todos los ítems de sus criterios de aceptación marcados y está en la columna "Hecho". | Se abre la tarjeta y se ve el enlace, la lista completa marcada y la columna. |
+| 3 | Todos los mensajes de commit y el título del PR cumplen la convención de la sección 2. | Se leen en `git log` o en la pestaña *Commits* del PR. |
+| 4 | La tarjeta de Trello tiene enlazado el PR, todos los ítems de sus criterios de aceptación marcados y está en la columna "Hecho". | Se abre la tarjeta y se ve el enlace, la lista completa marcada y la columna. |
+| 5 | Los valores sensibles se leen de variables de entorno guardadas en `.env.local`, ignorado por `.gitignore`. | Se busca en el diff del PR; `.gitignore` incluye `.env.local`. |
+| 6 | El formato pasa sin errores: `npx prettier --check .` y `npm run lint`. | Se ejecutan los comandos en un clon limpio y ambos terminan con código de salida 0. |
+| 7 | El proyecto compila: `npm run build` termina sin errores. | Se ejecuta el comando en un clon limpio y termina con código 0. |
+| 8 | Si el cambio altera una ruta de la API o el esquema de la base de datos, el `README.md` o la carpeta `docs/` se actualizó en el mismo PR. | El PR incluye el diff de `README.md` o `docs/`. |
 
 ---
 
@@ -117,20 +124,19 @@ Al ser un equipo de dos personas, la revisión es cruzada: el autor del PR nunca
 
 ### 5.2 Plazo
 
-El revisor responde (aprueba, solicita cambios o comenta) en un máximo de 72 horas desde que se le asigna el PR.
-Si el plazo vence sin respuesta, el autor escribe al revisor por el canal del equipo. Pasadas 24 horas más, puede fusionar si la ausencia es justificada y lo deja anotado en el PR. Esta excepción no aplica si se incumple alguna causal de bloqueo.
+El revisor responde (aprueba, solicita cambios o comenta) en un máximo de 72 horas desde la solicitud de revisión.
+Si el plazo vence sin respuesta, el autor puede fusionar el Pull Request solo si la ausencia del revisor es justificada, y lo deja anotado en el PR. Esta excepción no aplica si se incumple alguna causal de bloqueo.
 
 ### 5.3 Qué bloquea la aprobación
 
 El revisor debe solicitar cambios, y el PR no se fusiona, si ocurre cualquiera de estas:
 
-1. Falla `prettier`, `eslint` o `clang-format` (DoD 3).
-2. Falla `npm run build` (DoD 4).
-3. Hay un secreto, credencial o cadena de conexión en el diff (DoD 7).
-4. Implementa algo listado en las exclusiones del Acta de Constitución.
-5. Los commits o el título del PR no cumplen la convención de la sección 2.
-6. El PR no corresponde a ninguna tarjeta de Trello que cumpla el DoR.
-7. El cambio introduce una vulnerabilidad evidente, como una consulta SQL armada concatenando texto que escribió el usuario, o un endpoint de escritura sin autenticación.
+1. Falla `prettier`, `eslint` o `clang-format`.
+2. Implementa algo listado en las exclusiones del Acta de Constitución.
+3. Los commits o el título del PR no cumplen la convención de la sección 2.
+4. El PR no corresponde a ninguna tarjeta de Trello que cumpla el DoR.
+5. El cambio introduce una vulnerabilidad evidente, como una consulta SQL armada concatenando texto que escribió el usuario, o un endpoint de escritura sin autenticación.
+6. Falla `npm run build`.
 
 ### 5.4 Qué no bloquea
 
