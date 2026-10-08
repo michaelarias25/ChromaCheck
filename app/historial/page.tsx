@@ -1,5 +1,13 @@
 import { obtenerHistorialTarros } from '@/lib/modulos/tarros/servicio';
 
+interface FilaHistorialTarro {
+  id_tarro: number;
+  lote_codigo: string;
+  resultado: string;
+  resultado_hex: string;
+  desviacion_delta_e: string | number | null;
+}
+
 // Pantalla de historial: tabla con todos los tarros registrados
 export default async function PaginaHistorial() {
   const tarros = await obtenerHistorialTarros();
@@ -23,7 +31,7 @@ export default async function PaginaHistorial() {
               </tr>
             </thead>
             <tbody>
-              {tarros.map((tarro) => (
+              {tarros.map((tarro: FilaHistorialTarro) => (
                 <FilaTarro key={tarro.id_tarro} tarro={tarro} />
               ))}
             </tbody>
@@ -35,7 +43,7 @@ export default async function PaginaHistorial() {
 }
 
 // Una fila individual del historial
-function FilaTarro({ tarro }: { tarro: any }) {
+function FilaTarro({ tarro }: { tarro: FilaHistorialTarro }) {
   const esAprobado = tarro.resultado === 'Aprobado';
 
   return (
