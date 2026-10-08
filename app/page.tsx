@@ -1,5 +1,13 @@
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
 
+interface LoteConResumen {
+  id: number;
+  codigo: string;
+  estado: string;
+  muestra_hex: string | null;
+  desviacion_promedio: string | number | null;
+}
+
 // Pantalla principal: muestra todos los lotes en producción
 export default async function PaginaPrincipal() {
   const lotes = await obtenerLotesConResumen();
@@ -12,7 +20,7 @@ export default async function PaginaPrincipal() {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {lotes.map((lote) => (
+          {lotes.map((lote: LoteConResumen) => (
             <TarjetaLote key={lote.id} lote={lote} />
           ))}
         </div>
@@ -22,7 +30,7 @@ export default async function PaginaPrincipal() {
 }
 
 // Una tarjeta individual de lote
-function TarjetaLote({ lote }: { lote: any }) {
+function TarjetaLote({ lote }: { lote: LoteConResumen }) {
   const colorMuestra = lote.muestra_hex || '#555555';
   const desviacion = lote.desviacion_promedio ?? '—';
 

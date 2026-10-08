@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import Image from "next/image";
 import Link from "next/link";
 
 const geistSans = Geist({
@@ -13,6 +14,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Chroma Check",
   description: "Sistema de control espectrométrico industrial",
@@ -22,23 +35,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${inter.variable} ${montserrat.variable} h-full antialiased`}
     >
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="min-h-full flex flex-col">
         <header className="h-16 px-8 flex items-center justify-between border-b-2 border-surface-container-highest bg-surface-container-lowest">
           
           <div className="flex items-center h-10 w-auto">
-            <img 
-              src="/logo.png" 
-              alt="Chroma Check Logo" 
-              className="h-full w-auto object-contain" 
+            <Image
+              src="/logo.png"
+              alt="Chroma Check Logo"
+              width={142}
+              height={40}
+              priority
+              className="h-full w-auto object-contain"
             />
           </div>
           
