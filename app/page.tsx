@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
 
 interface LoteConResumen {
@@ -11,6 +12,8 @@ interface LoteConResumen {
 
 // Pantalla principal: muestra todos los lotes en producción
 export default async function PaginaPrincipal() {
+  // Espera la petición para que los lotes se consulten en cada visita y no al compilar
+  await connection();
   const lotes = await obtenerLotesConResumen();
 
   return (
