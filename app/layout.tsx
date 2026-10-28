@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   description: "Sistema de control espectrométrico industrial",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function PlantillaPrincipal({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
