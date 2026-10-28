@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
 
 interface LoteConResumen {
@@ -69,12 +70,12 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
           </div>
         </div>
 
-        <a
+        <Link
           href={`/lotes/${lote.id}`}
           className="w-full h-14 bg-primary-container text-on-primary-container flex items-center justify-center rounded font-headline uppercase tracking-wider"
         >
           Ver Monitoreo de Lote
-        </a>
+        </Link>
       </div>
     </article>
   );
