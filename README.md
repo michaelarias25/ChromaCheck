@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChromaCheck
 
-## Getting Started
+Plataforma web de control de calidad para una fábrica de pintura. Un prototipo IoT (Arduino con sensor TCS3200) lee el color de cada tarro, el sistema calcula su desviación de color (ΔE) frente al tarro muestra del lote y genera alertas cuando la desviación supera la tolerancia.
 
-First, run the development server:
+## Tecnologías
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16 (App Router), React 19 y TypeScript: pantallas y API en un solo proyecto.
+- Tailwind CSS 4.
+- PostgreSQL 17 alojado en Neon, con el paquete `pg`.
+
+## Para iniciar el proyecto
+
+1. Instalar las dependencias:
+
+   ```bash
+   npm install
+   ```
+
+2. Copiar `.env.example` como `.env.local` y escribir la cadena de conexión de Neon en `DATABASE_URL`. El archivo `.env.local` no se sube al repositorio.
+
+3. Iniciar el servidor de desarrollo:
+
+   ```bash
+   npm run dev
+   ```
+
+## Comandos
+
+| Comando | Uso |
+| --- | --- |
+| `npm run dev` | Servidor de desarrollo en <http://localhost:3000> |
+| `npm run build` | Compilación de producción |
+| `npm run start` | Servidor de producción (después de `build`) |
+| `npm run lint` | Revisión con ESLint |
+
+## Rutas
+
+| Ruta | Pantalla |
+| --- | --- |
+| `/` | Lotes en producción, con su color muestra y desviación promedio |
+| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro y últimas 8 lecturas |
+| `/historial` | Historial de calidad de todos los tarros, 6 por página (`?pagina=N`) |
+
+La API se documenta en [docs/api.md](docs/api.md).
+
+## Estructura
+
+```text
+app/                  Pantallas (page.tsx) y endpoints de la API (api/**/route.ts)
+lib/db.ts             Pool de conexiones a PostgreSQL
+lib/modulos/lotes     Consultas y reglas de los lotes
+lib/modulos/tarros    Registro de tarros, cálculo de deltaE y patrón acumulativo
+lib/modulos/alertas   Registro y consulta de alertas
+public/               Logo e imágenes
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Base de datos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Tabla | Columnas |
+| --- | --- |
+| `lotes` | `id`, `codigo`, `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `fecha_inicio` |
+| `tarros` | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp` |
+| `alertas` | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp` |
+| `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Integrantes
 
-## Learn More
+- Lauren Camila Castro Vera
+- Michael David Arias Torres
 
-To learn more about Next.js, take a look at the following resources:
+## Materias involucradas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Desarrollo Orientado a Servicios
+- Gerencia de Software
