@@ -50,12 +50,14 @@ function FilaTarro({ tarro }: { tarro: FilaHistorialTarro }) {
     <tr className="border-t border-surface-container-highest">
       <td className="px-5 py-4">#TR-{tarro.id_tarro}</td>
       <td className="px-5 py-4">{tarro.lote_codigo}</td>
-      <td className="px-5 py-4 flex items-center gap-2">
-        <span
-          className="w-6 h-6 rounded"
-          style={{ backgroundColor: tarro.resultado_hex }}
-        />
-        {tarro.resultado_hex}
+      <td className="px-5 py-4">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-6 h-6 rounded"
+            style={{ backgroundColor: tarro.resultado_hex }}
+          />
+          {tarro.resultado_hex}
+        </div>
       </td>
       <td className="px-5 py-4 text-xl font-bold">{tarro.desviacion_delta_e}</td>
       <td className="px-5 py-4">
