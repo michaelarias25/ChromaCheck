@@ -75,6 +75,10 @@ export async function POST(peticion: Request) {
     if (!muestra) {
       return responderError('El lote no tiene tarro muestra registrado', 409);
     }
+    // Una alerta roja pausa el lote: no se aceptan lecturas hasta revisar la línea
+    if (lote.estado === 'Pausado') {
+      return responderError('El lote está pausado por una alerta roja y no acepta lecturas', 409);
+    }
 
     const tarroNuevo = await registrarLecturaTarro(loteId, resultadoHex, rgb);
     return responderExito(tarroNuevo, 201);
