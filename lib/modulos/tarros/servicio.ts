@@ -40,8 +40,8 @@ export async function obtenerHistorialTarros() {
 
 // Convierte un color RGB (0-255) a espacio Lab, paso previo para calcular deltaE
 function convertirRgbALab(r: number, g: number, b: number) {
-  const linearizar = (c: number) => {
-    const valor = c / 255;
+  const linearizar = (canal: number) => {
+    const valor = canal / 255;
     return valor > 0.04045
       ? Math.pow((valor + 0.055) / 1.055, 2.4)
       : valor / 12.92;
@@ -55,16 +55,17 @@ function convertirRgbALab(r: number, g: number, b: number) {
   const y = (rLineal * 0.2126 + gLineal * 0.7152 + bLineal * 0.0722) / 1.0;
   const z = (rLineal * 0.0193 + gLineal * 0.1192 + bLineal * 0.9505) / 1.08883;
 
-  const f = (t: number) =>
-    t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116;
+  // Función f(t) de la norma CIE: raíz cúbica, o aproximación lineal cerca de cero
+  const comprimirComponente = (componente: number) =>
+    componente > 0.008856 ? Math.cbrt(componente) : 7.787 * componente + 16 / 116;
 
-  const fx = f(x);
-  const fy = f(y);
-  const fz = f(z);
+  const xComprimido = comprimirComponente(x);
+  const yComprimido = comprimirComponente(y);
+  const zComprimido = comprimirComponente(z);
 
-  const l = 116 * fy - 16;
-  const a = 500 * (fx - fy);
-  const bLab = 200 * (fy - fz);
+  const l = 116 * yComprimido - 16;
+  const a = 500 * (xComprimido - yComprimido);
+  const bLab = 200 * (yComprimido - zComprimido);
 
   return { l, a, b: bLab };
 }
