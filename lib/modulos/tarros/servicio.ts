@@ -20,22 +20,34 @@ export async function obtenerMuestraDeLote(loteId: number) {
   return resultado.rows[0] || null;
 }
 
-// Trae todos los tarros con el código de su lote, para el historial general
-export async function obtenerHistorialTarros() {
-  const resultado = await pool.query(`
-    SELECT
-      t.id_tarro,
-      t.resultado_hex,
-      t.desviacion_delta_e,
-      t.resultado,
-      t.timestamp,
-      l.codigo AS lote_codigo
-    FROM tarros t
-    JOIN lotes l ON l.id = t.lote_id
-    WHERE t.es_muestra = false
-    ORDER BY t.timestamp DESC
-  `);
-  return resultado.rows;
+// Trae una página del historial general de tarros con el código de su lote,
+// junto con el total de tarros para calcular cuántas páginas hay
+export async function obtenerHistorialTarros(pagina: number, tarrosPorPagina: number) {
+  const desplazamiento = (pagina - 1) * tarrosPorPagina;
+
+  const [resultadoTarros, resultadoTotal] = await Promise.all([
+    pool.query(
+      `SELECT
+         t.id_tarro,
+         t.resultado_hex,
+         t.desviacion_delta_e,
+         t.resultado,
+         t.timestamp,
+         l.codigo AS lote_codigo
+       FROM tarros t
+       JOIN lotes l ON l.id = t.lote_id
+       WHERE t.es_muestra = false
+       ORDER BY t.timestamp DESC, t.id_tarro DESC
+       LIMIT $1 OFFSET $2`,
+      [tarrosPorPagina, desplazamiento]
+    ),
+    pool.query('SELECT COUNT(*) AS total FROM tarros WHERE es_muestra = false'),
+  ]);
+
+  return {
+    tarros: resultadoTarros.rows,
+    totalTarros: Number(resultadoTotal.rows[0].total),
+  };
 }
 
 // Convierte un color RGB (0-255) a espacio Lab, paso previo para calcular deltaE

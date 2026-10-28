@@ -1,4 +1,9 @@
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { obtenerHistorialTarros } from '@/lib/modulos/tarros/servicio';
+
+const TARROS_POR_PAGINA = 6;
 
 interface FilaHistorialTarro {
   id_tarro: number;
@@ -8,9 +13,23 @@ interface FilaHistorialTarro {
   desviacion_delta_e: string | number | null;
 }
 
-// Pantalla de historial: tabla con todos los tarros registrados
-export default async function PaginaHistorial() {
-  const tarros = await obtenerHistorialTarros();
+// Convierte el parámetro ?pagina= en un número de página válido (1 si viene vacío o mal escrito)
+function leerNumeroPagina(parametroPagina: string | string[] | undefined): number {
+  const numeroPagina = Number(Array.isArray(parametroPagina) ? parametroPagina[0] : parametroPagina);
+  return Number.isInteger(numeroPagina) && numeroPagina >= 1 ? numeroPagina : 1;
+}
+
+// Pantalla de historial: tabla paginada con los tarros registrados
+export default async function PaginaHistorial({ searchParams }: PageProps<'/historial'>) {
+  const { pagina } = await searchParams;
+  const paginaActual = leerNumeroPagina(pagina);
+
+  const { tarros, totalTarros } = await obtenerHistorialTarros(paginaActual, TARROS_POR_PAGINA);
+  const totalPaginas = Math.max(1, Math.ceil(totalTarros / TARROS_POR_PAGINA));
+
+  if (paginaActual > totalPaginas) {
+    redirect(`/historial?pagina=${totalPaginas}`);
+  }
 
   return (
     <main className="min-h-screen bg-surface text-on-surface">
@@ -34,11 +53,88 @@ export default async function PaginaHistorial() {
               {tarros.map((tarro: FilaHistorialTarro) => (
                 <FilaTarro key={tarro.id_tarro} tarro={tarro} />
               ))}
+              {tarros.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-on-surface-variant">
+                    Aún no hay tarros registrados.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
+
+        <ControlesPaginacion paginaActual={paginaActual} totalPaginas={totalPaginas} />
       </section>
     </main>
+  );
+}
+
+// Botones de página anterior y siguiente, con el indicador de página actual
+function ControlesPaginacion({
+  paginaActual,
+  totalPaginas,
+}: {
+  paginaActual: number;
+  totalPaginas: number;
+}) {
+  const tienePaginaAnterior = paginaActual > 1;
+  const tienePaginaSiguiente = paginaActual < totalPaginas;
+
+  return (
+    <nav className="mt-6 flex items-center justify-between" aria-label="Paginación del historial">
+      <BotonPaginacion
+        destino={`/historial?pagina=${paginaActual - 1}`}
+        estaHabilitado={tienePaginaAnterior}
+      >
+        Anterior
+      </BotonPaginacion>
+
+      <span className="text-sm text-on-surface-variant uppercase">
+        Página {paginaActual} de {totalPaginas}
+      </span>
+
+      <BotonPaginacion
+        destino={`/historial?pagina=${paginaActual + 1}`}
+        estaHabilitado={tienePaginaSiguiente}
+      >
+        Siguiente
+      </BotonPaginacion>
+    </nav>
+  );
+}
+
+// Un botón de paginación; si no hay página a la cual ir se muestra deshabilitado
+function BotonPaginacion({
+  destino,
+  estaHabilitado,
+  children,
+}: {
+  destino: string;
+  estaHabilitado: boolean;
+  children: ReactNode;
+}) {
+  const clasesBase =
+    'px-4 h-9 flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider';
+
+  if (!estaHabilitado) {
+    return (
+      <span
+        className={`${clasesBase} bg-surface-container text-on-surface-variant opacity-50 cursor-not-allowed`}
+        aria-disabled="true"
+      >
+        {children}
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      href={destino}
+      className={`${clasesBase} bg-surface-container-high text-on-surface transition hover:bg-surface-container-highest`}
+    >
+      {children}
+    </Link>
   );
 }
 
