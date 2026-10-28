@@ -20,10 +20,45 @@ export async function obtenerMuestraDeLote(loteId: number) {
   return resultado.rows[0] || null;
 }
 
+// Filtros opcionales del historial; un campo sin valor no filtra
+export interface FiltrosHistorialTarros {
+  idTarro?: number;
+  loteId?: number;
+  resultado?: string;
+  fechaDesde?: string; // AAAA-MM-DD, inclusive
+  fechaHasta?: string; // AAAA-MM-DD, inclusive
+}
+
+// Arma la condición WHERE del historial con parámetros numerados ($1, $2...)
+function construirCondicionHistorial(filtros: FiltrosHistorialTarros) {
+  const condiciones = ['t.es_muestra = false'];
+  const valores: (string | number)[] = [];
+
+  const agregarCondicion = (condicion: string, valor: string | number) => {
+    valores.push(valor);
+    condiciones.push(condicion.replace('?', `$${valores.length}`));
+  };
+
+  if (filtros.idTarro !== undefined) agregarCondicion('t.id_tarro = ?', filtros.idTarro);
+  if (filtros.loteId !== undefined) agregarCondicion('t.lote_id = ?', filtros.loteId);
+  if (filtros.resultado !== undefined) agregarCondicion('t.resultado = ?', filtros.resultado);
+  if (filtros.fechaDesde !== undefined) agregarCondicion('t.timestamp >= ?::date', filtros.fechaDesde);
+  if (filtros.fechaHasta !== undefined) {
+    agregarCondicion("t.timestamp < ?::date + INTERVAL '1 day'", filtros.fechaHasta);
+  }
+
+  return { condicion: condiciones.join(' AND '), valores };
+}
+
 // Trae una página del historial general de tarros con el código de su lote,
-// junto con el total de tarros para calcular cuántas páginas hay
-export async function obtenerHistorialTarros(pagina: number, tarrosPorPagina: number) {
+// junto con el total de tarros que cumplen los filtros para calcular cuántas páginas hay
+export async function obtenerHistorialTarros(
+  pagina: number,
+  tarrosPorPagina: number,
+  filtros: FiltrosHistorialTarros = {}
+) {
   const desplazamiento = (pagina - 1) * tarrosPorPagina;
+  const { condicion, valores } = construirCondicionHistorial(filtros);
 
   const [resultadoTarros, resultadoTotal] = await Promise.all([
     pool.query(
@@ -36,12 +71,12 @@ export async function obtenerHistorialTarros(pagina: number, tarrosPorPagina: nu
          l.codigo AS lote_codigo
        FROM tarros t
        JOIN lotes l ON l.id = t.lote_id
-       WHERE t.es_muestra = false
+       WHERE ${condicion}
        ORDER BY t.timestamp DESC, t.id_tarro DESC
-       LIMIT $1 OFFSET $2`,
-      [tarrosPorPagina, desplazamiento]
+       LIMIT $${valores.length + 1} OFFSET $${valores.length + 2}`,
+      [...valores, tarrosPorPagina, desplazamiento]
     ),
-    pool.query('SELECT COUNT(*) AS total FROM tarros WHERE es_muestra = false'),
+    pool.query(`SELECT COUNT(*) AS total FROM tarros t WHERE ${condicion}`, valores),
   ]);
 
   return {
