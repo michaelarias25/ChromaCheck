@@ -1,21 +1,33 @@
+import { notFound } from 'next/navigation';
 import { obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
-import { obtenerTarrosDeLote, obtenerMuestraDeLote } from '@/lib/modulos/tarros/servicio';
+import {
+  obtenerLecturasRecientesDeLote,
+  obtenerMuestraDeLote,
+} from '@/lib/modulos/tarros/servicio';
+
+const CANTIDAD_LECTURAS_RECIENTES = 8;
 
 // Pantalla de monitoreo: detalle en vivo de un lote específico
-export default async function PaginaLote({ params,}: { params: Promise<{ id: string }>;}) {
+export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
   const { id } = await params;
   const loteId = Number(id);
 
-  const lote = await obtenerLotePorId(loteId);
-  const muestra = await obtenerMuestraDeLote(loteId);
-  const tarros = await obtenerTarrosDeLote(loteId);
+  // Un id que no es un entero positivo no puede ser un lote: se responde 404 sin consultar la base
+  if (!Number.isInteger(loteId) || loteId < 1) {
+    notFound();
+  }
 
-  const lecturasRecientes = tarros.filter((tarro) => !tarro.es_muestra).slice(-8).reverse();
-  const ultimoTarro = lecturasRecientes[0];
+  const [lote, muestra, lecturasRecientes] = await Promise.all([
+    obtenerLotePorId(loteId),
+    obtenerMuestraDeLote(loteId),
+    obtenerLecturasRecientesDeLote(loteId, CANTIDAD_LECTURAS_RECIENTES),
+  ]);
 
   if (!lote) {
-    return <main className="p-10 text-on-surface">Lote no encontrado.</main>;
+    notFound();
   }
+
+  const ultimoTarro = lecturasRecientes[0];
 
   return (
     <main className="min-h-screen bg-surface text-on-surface">

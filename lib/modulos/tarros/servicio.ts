@@ -11,6 +11,18 @@ export async function obtenerTarrosDeLote(loteId: number) {
   return resultado.rows;
 }
 
+// Trae las lecturas más recientes de un lote (sin la muestra), de la más nueva a la más antigua
+export async function obtenerLecturasRecientesDeLote(loteId: number, cantidad: number) {
+  const resultado = await pool.query(
+    `SELECT * FROM tarros
+     WHERE lote_id = $1 AND es_muestra = false
+     ORDER BY timestamp DESC, id_tarro DESC
+     LIMIT $2`,
+    [loteId, cantidad]
+  );
+  return resultado.rows;
+}
+
 // Trae el tarro muestra (referencia) de un lote
 export async function obtenerMuestraDeLote(loteId: number) {
   const resultado = await pool.query(
