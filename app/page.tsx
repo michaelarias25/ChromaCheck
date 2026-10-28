@@ -37,6 +37,7 @@ export default async function PaginaPrincipal() {
 function TarjetaLote({ lote }: { lote: LoteConResumen }) {
   const colorMuestra = lote.muestra_hex || '#555555';
   const desviacion = lote.desviacion_promedio ?? '—';
+  const estaPausado = lote.estado === 'Pausado';
 
   return (
     <article className="bg-surface-container rounded-lg overflow-hidden shadow-md">
@@ -45,7 +46,13 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
           <span className="text-xs uppercase text-on-surface-variant block">ID Lote</span>
           <span className="font-headline text-lg font-bold">{lote.codigo}</span>
         </div>
-        <span className="px-3 py-1 bg-secondary-container text-secondary-fixed text-xs uppercase rounded">
+        <span
+          className={`px-3 py-1 text-xs uppercase rounded ${
+            estaPausado
+              ? 'bg-primary-container text-on-primary-container'
+              : 'bg-secondary-container text-secondary-fixed'
+          }`}
+        >
           {lote.estado}
         </span>
       </div>
