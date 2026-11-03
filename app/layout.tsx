@@ -3,6 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import Image from "next/image";
 import Link from "next/link";
+import BotonCerrarSesion from "./componentes/BotonCerrarSesion";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -55,6 +56,8 @@ export default function PlantillaPrincipal({ children }: LayoutProps<"/">) {
             >
               Historial
             </Link>
+
+            <BotonCerrarSesion />
           </nav>
         </header>
         {children}
