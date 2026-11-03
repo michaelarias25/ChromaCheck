@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { connection } from 'next/server';
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
 
 interface LoteConResumen {
@@ -10,6 +12,8 @@ interface LoteConResumen {
 
 // Pantalla principal: muestra todos los lotes en producción
 export default async function PaginaPrincipal() {
+  // Espera la petición para que los lotes se consulten en cada visita y no al compilar
+  await connection();
   const lotes = await obtenerLotesConResumen();
 
   return (
@@ -33,6 +37,7 @@ export default async function PaginaPrincipal() {
 function TarjetaLote({ lote }: { lote: LoteConResumen }) {
   const colorMuestra = lote.muestra_hex || '#555555';
   const desviacion = lote.desviacion_promedio ?? '—';
+  const estaPausado = lote.estado === 'Pausado';
 
   return (
     <article className="bg-surface-container rounded-lg overflow-hidden shadow-md">
@@ -41,7 +46,13 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
           <span className="text-xs uppercase text-on-surface-variant block">ID Lote</span>
           <span className="font-headline text-lg font-bold">{lote.codigo}</span>
         </div>
-        <span className="px-3 py-1 bg-secondary-container text-secondary-fixed text-xs uppercase rounded">
+        <span
+          className={`px-3 py-1 text-xs uppercase rounded ${
+            estaPausado
+              ? 'bg-primary-container text-on-primary-container'
+              : 'bg-secondary-container text-secondary-fixed'
+          }`}
+        >
           {lote.estado}
         </span>
       </div>
@@ -69,12 +80,12 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
           </div>
         </div>
 
-        <a
+        <Link
           href={`/lotes/${lote.id}`}
           className="w-full h-14 bg-primary-container text-on-primary-container flex items-center justify-center rounded font-headline uppercase tracking-wider"
         >
           Ver Monitoreo de Lote
-        </a>
+        </Link>
       </div>
     </article>
   );

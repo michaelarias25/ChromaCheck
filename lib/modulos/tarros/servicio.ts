@@ -11,6 +11,18 @@ export async function obtenerTarrosDeLote(loteId: number) {
   return resultado.rows;
 }
 
+// Trae las lecturas más recientes de un lote (sin la muestra), de la más nueva a la más antigua
+export async function obtenerLecturasRecientesDeLote(loteId: number, cantidad: number) {
+  const resultado = await pool.query(
+    `SELECT * FROM tarros
+     WHERE lote_id = $1 AND es_muestra = false
+     ORDER BY timestamp DESC, id_tarro DESC
+     LIMIT $2`,
+    [loteId, cantidad]
+  );
+  return resultado.rows;
+}
+
 // Trae el tarro muestra (referencia) de un lote
 export async function obtenerMuestraDeLote(loteId: number) {
   const resultado = await pool.query(
@@ -20,28 +32,40 @@ export async function obtenerMuestraDeLote(loteId: number) {
   return resultado.rows[0] || null;
 }
 
-// Trae todos los tarros con el código de su lote, para el historial general
-export async function obtenerHistorialTarros() {
-  const resultado = await pool.query(`
-    SELECT
-      t.id_tarro,
-      t.resultado_hex,
-      t.desviacion_delta_e,
-      t.resultado,
-      t.timestamp,
-      l.codigo AS lote_codigo
-    FROM tarros t
-    JOIN lotes l ON l.id = t.lote_id
-    WHERE t.es_muestra = false
-    ORDER BY t.timestamp DESC
-  `);
-  return resultado.rows;
+// Trae una página del historial general de tarros con el código de su lote,
+// junto con el total de tarros para calcular cuántas páginas hay
+export async function obtenerHistorialTarros(pagina: number, tarrosPorPagina: number) {
+  const desplazamiento = (pagina - 1) * tarrosPorPagina;
+
+  const [resultadoTarros, resultadoTotal] = await Promise.all([
+    pool.query(
+      `SELECT
+         t.id_tarro,
+         t.resultado_hex,
+         t.desviacion_delta_e,
+         t.resultado,
+         t.timestamp,
+         l.codigo AS lote_codigo
+       FROM tarros t
+       JOIN lotes l ON l.id = t.lote_id
+       WHERE t.es_muestra = false
+       ORDER BY t.timestamp DESC, t.id_tarro DESC
+       LIMIT $1 OFFSET $2`,
+      [tarrosPorPagina, desplazamiento]
+    ),
+    pool.query('SELECT COUNT(*) AS total FROM tarros WHERE es_muestra = false'),
+  ]);
+
+  return {
+    tarros: resultadoTarros.rows,
+    totalTarros: Number(resultadoTotal.rows[0].total),
+  };
 }
 
 // Convierte un color RGB (0-255) a espacio Lab, paso previo para calcular deltaE
 function convertirRgbALab(r: number, g: number, b: number) {
-  const linearizar = (c: number) => {
-    const valor = c / 255;
+  const linearizar = (canal: number) => {
+    const valor = canal / 255;
     return valor > 0.04045
       ? Math.pow((valor + 0.055) / 1.055, 2.4)
       : valor / 12.92;
@@ -55,16 +79,17 @@ function convertirRgbALab(r: number, g: number, b: number) {
   const y = (rLineal * 0.2126 + gLineal * 0.7152 + bLineal * 0.0722) / 1.0;
   const z = (rLineal * 0.0193 + gLineal * 0.1192 + bLineal * 0.9505) / 1.08883;
 
-  const f = (t: number) =>
-    t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116;
+  // Función f(t) de la norma CIE: raíz cúbica, o aproximación lineal cerca de cero
+  const comprimirComponente = (componente: number) =>
+    componente > 0.008856 ? Math.cbrt(componente) : 7.787 * componente + 16 / 116;
 
-  const fx = f(x);
-  const fy = f(y);
-  const fz = f(z);
+  const xComprimido = comprimirComponente(x);
+  const yComprimido = comprimirComponente(y);
+  const zComprimido = comprimirComponente(z);
 
-  const l = 116 * fy - 16;
-  const a = 500 * (fx - fy);
-  const bLab = 200 * (fy - fz);
+  const l = 116 * yComprimido - 16;
+  const a = 500 * (xComprimido - yComprimido);
+  const bLab = 200 * (yComprimido - zComprimido);
 
   return { l, a, b: bLab };
 }
