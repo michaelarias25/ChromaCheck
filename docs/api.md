@@ -72,3 +72,7 @@ Lectura del sensor (calcula deltaE frente a la muestra y genera alertas):
 | 400 | Cuerpo inválido, o `loteId`, `resultadoHex` o `rgb` con formato incorrecto, o `rgb` distinto de `resultadoHex` |
 | 404 | El lote no existe |
 | 409 | El lote ya tiene muestra (al registrar otra), no tiene muestra (al registrar una lectura) o está `Pausado` por una alerta roja |
+
+## Autenticación
+
+El login (`POST /api/auth/login`, `POST /api/auth/logout`) y la protección de páginas con `proxy.ts` están documentados en `docs/autenticacion.md`.
