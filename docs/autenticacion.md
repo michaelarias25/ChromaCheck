@@ -31,8 +31,23 @@ Cuerpo: `{ "nombreUsuario": string, "contrasena": string }`
 |---|---|
 | Credenciales correctas | `200` `{ exito: true, datos: { id, nombreUsuario } }` y cookie `sesion` (HttpOnly) |
 | Faltan campos | `400` `{ exito: false, error: "Ingresa usuario y contraseña" }` |
+| El cuerpo no es un objeto JSON | `400` `{ exito: false, error: "El cuerpo de la petición debe ser un objeto JSON" }` |
 | Credenciales incorrectas | `401` `{ exito: false, error: "Usuario o contraseña incorrectos" }` (no indica cuál campo falló) |
 
 ### `POST /api/auth/logout`
 
-Elimina la cookie `sesion`. Responde `200` `{ exito: true }`.
+Elimina la cookie `sesion`. Responde `200` `{ exito: true, datos: null }`.
+
+Los errores internos responden `500` con `"Error interno del servidor"`, igual que el resto de la API (ver `docs/api.md`).
+
+## Protección de rutas
+
+`proxy.ts` revisa la cookie `sesion` en cada página. Sin sesión válida redirige a `/login`. Las rutas `/api/**` no pasan por el proxy: el script de Python que envía las lecturas del sensor (historia 06) no inicia sesión.
+
+## Crear un usuario
+
+No hay registro público. Los usuarios los crea el equipo desde la terminal:
+
+```bash
+node --env-file=.env.local --experimental-strip-types scripts/crear-usuario.ts <nombre_usuario> <contrasena>
+```
