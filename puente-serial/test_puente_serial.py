@@ -8,6 +8,7 @@ from puente_serial import (
     convertir_rgb_a_hex,
     enviar_lectura,
     interpretar_linea,
+    procesar_linea,
 )
 
 
@@ -119,6 +120,27 @@ class PruebasEnviarLectura(unittest.TestCase):
     def test_api_apagada_se_registra_sin_lanzar_excepcion(self):
         with self.assertLogs(level='ERROR'):
             self.assertFalse(enviar_lectura('http://127.0.0.1:9', construir_cuerpo(1, (1, 2, 3))))
+
+    def test_procesar_linea_envia_solo_las_lecturas(self):
+        self.assertIsNone(procesar_linea('AVISO;LISTO', 1, self.url))
+        self.assertEqual(ApiFalsa.cuerpos_recibidos, [])
+
+        self.assertTrue(procesar_linea('LECTURA;227;83;55\r\n', 1, self.url))
+        self.assertEqual(ApiFalsa.cuerpos_recibidos[0][1]['rgb'], [227, 83, 55])
+
+    def test_procesar_linea_como_muestra_no_envia_rgb(self):
+        self.assertTrue(procesar_linea('LECTURA;227;83;55', 1, self.url, es_muestra=True))
+        self.assertEqual(
+            ApiFalsa.cuerpos_recibidos[0][1],
+            {'loteId': 1, 'resultadoHex': '#E35337', 'esMuestra': True},
+        )
+
+    def test_procesar_linea_sigue_tras_un_error_de_la_api(self):
+        ApiFalsa.estado = 500
+        with self.assertLogs(level='ERROR'):
+            self.assertFalse(procesar_linea('LECTURA;1;2;3', 1, self.url))
+        ApiFalsa.estado = 201
+        self.assertTrue(procesar_linea('LECTURA;1;2;3', 1, self.url))
 
 
 if __name__ == '__main__':
