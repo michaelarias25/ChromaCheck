@@ -1,0 +1,8 @@
+# Estilo único para todo el firmware C++ del proyecto (norma del equipo: clang-format)
+BasedOnStyle: Google
+Language: Cpp
+ColumnLimit: 100
+IndentWidth: 2
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+SortIncludes: false
