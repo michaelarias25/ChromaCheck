@@ -5,6 +5,7 @@ import {
   responderErrorInterno,
   responderExito,
 } from '@/lib/respuestas';
+import { excedeLongitudCodigoLote, LONGITUD_MAXIMA_CODIGO_LOTE } from '@/lib/validacion';
 
 export async function GET() {
   try {
@@ -26,8 +27,17 @@ export async function POST(peticion: Request) {
     if (!codigo) {
       return responderError('El campo "codigo" es obligatorio', 400);
     }
+    if (excedeLongitudCodigoLote(codigo)) {
+      return responderError(
+        `El campo "codigo" no puede tener más de ${LONGITUD_MAXIMA_CODIGO_LOTE} caracteres`,
+        400
+      );
+    }
 
     const loteNuevo = await crearLote(codigo);
+    if (!loteNuevo) {
+      return responderError(`Ya existe un lote con el código "${codigo}"`, 409);
+    }
     return responderExito(loteNuevo, 201);
   } catch (error) {
     return responderErrorInterno(error);

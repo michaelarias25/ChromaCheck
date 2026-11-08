@@ -9,7 +9,8 @@ export async function obtenerLotes() {
   return resultado.rows;
 }
 
-// Crea un lote nuevo con el código dado (ej. "#005_Azul_Cielo")
+// Crea un lote nuevo con el código dado (ej. "#005_Azul_Cielo").
+// Devuelve null si ya existe un lote con ese código
 export async function crearLote(codigo: string) {
   return insertarLote(codigo);
 }
