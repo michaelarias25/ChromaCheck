@@ -145,8 +145,8 @@ function AvisoLotePausado({ alertaQuePauso }: { alertaQuePauso: AlertaLote | und
       </p>
       {alertaQuePauso ? (
         <p className="text-sm">
-          Motivo: alerta roja del {formatearFechaHora(alertaQuePauso.timestamp)}.{' '}
-          {alertaQuePauso.mensaje}.
+          Motivo: {alertaQuePauso.mensaje}. Alerta roja del{' '}
+          {formatearFechaHora(alertaQuePauso.timestamp)}
         </p>
       ) : (
         <p className="text-sm">Motivo: alerta roja por desviación acumulativa de color.</p>
