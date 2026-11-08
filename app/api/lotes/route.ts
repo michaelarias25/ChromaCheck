@@ -1,3 +1,5 @@
+import type { NextRequest } from 'next/server';
+import { NOMBRE_COOKIE_SESION, verificarTokenSesion } from '@/lib/modulos/auth/sesion';
 import { obtenerLotes, crearLote } from '@/lib/modulos/lotes/servicio';
 import {
   leerCuerpoJson,
@@ -16,8 +18,14 @@ export async function GET() {
   }
 }
 
-export async function POST(peticion: Request) {
+// Solo la web crea lotes (el puente serial no usa esta ruta), así que exige sesión
+export async function POST(peticion: NextRequest) {
   try {
+    const idUsuario = await verificarTokenSesion(peticion.cookies.get(NOMBRE_COOKIE_SESION)?.value);
+    if (!idUsuario) {
+      return responderError('Inicia sesión para crear un lote', 401);
+    }
+
     const cuerpo = await leerCuerpoJson(peticion);
     if (!cuerpo) {
       return responderError('El cuerpo de la petición debe ser un objeto JSON', 400);
