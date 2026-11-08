@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { formatearDeltaE } from '@/lib/formato';
 import { obtenerHistorialTarros } from '@/lib/modulos/tarros/servicio';
+import InsigniaResultado from '../componentes/InsigniaResultado';
 
 const TARROS_POR_PAGINA = 6;
 
@@ -140,8 +142,6 @@ function BotonPaginacion({
 
 // Una fila individual del historial
 function FilaTarro({ tarro }: { tarro: FilaHistorialTarro }) {
-  const esAprobado = tarro.resultado === 'Aprobado';
-
   return (
     <tr className="border-t border-surface-container-highest">
       <td className="px-5 py-4">#TR-{tarro.id_tarro}</td>
@@ -150,22 +150,20 @@ function FilaTarro({ tarro }: { tarro: FilaHistorialTarro }) {
         <div className="flex items-center gap-2">
           <span
             className="w-6 h-6 rounded"
+            aria-hidden="true"
             style={{ backgroundColor: tarro.resultado_hex }}
           />
           {tarro.resultado_hex}
         </div>
       </td>
-      <td className="px-5 py-4 text-xl font-bold">{tarro.desviacion_delta_e}</td>
+      <td className="px-5 py-4 text-xl font-bold tabular-nums">
+        {formatearDeltaE(tarro.desviacion_delta_e)}
+      </td>
       <td className="px-5 py-4">
-        <span
-          className={`px-3 py-1 rounded text-xs uppercase font-bold ${
-            esAprobado
-              ? 'bg-secondary-container text-secondary-fixed'
-              : 'bg-primary-container text-on-primary-container'
-          }`}
-        >
-          {tarro.resultado}
-        </span>
+        <InsigniaResultado
+          resultado={tarro.resultado}
+          desviacionDeltaE={tarro.desviacion_delta_e}
+        />
       </td>
     </tr>
   );
