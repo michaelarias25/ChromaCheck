@@ -38,8 +38,10 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 | Ruta | Pantalla |
 | --- | --- |
 | `/` | Lotes en producción, con su color muestra y desviación promedio. El botón **Agregar lote** crea un lote nuevo con su código |
-| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro y últimas 8 lecturas |
+| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro, últimas 8 lecturas y alertas del lote (de la más reciente a la más antigua). Si el lote está pausado, muestra un aviso con el motivo |
 | `/historial` | Historial de calidad de todos los tarros, 6 por página (`?pagina=N`) |
+
+En ambas pantallas el ΔE se muestra con 2 decimales (`—` si no está calculado) y el resultado de cada tarro con texto y símbolo: **Aprobado**, **No aprobado** o **Sin calcular**.
 
 Los lotes se crean desde la pantalla principal; no se renombran. La API se documenta en [docs/api.md](docs/api.md). `POST /api/lotes` exige sesión iniciada; las demás rutas de la API quedan abiertas para el puente serial.
 
