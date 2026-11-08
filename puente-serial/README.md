@@ -15,7 +15,15 @@ pip install -r requirements.txt
 
 ## Uso
 
-1. Con el servidor de ChromaCheck en marcha y el Arduino conectado, crear el lote (`POST /api/lotes`) y anotar su `id`.
+1. Con el servidor de ChromaCheck en marcha y el Arduino conectado, crear el lote. La app no tiene pantalla para esto, se hace con el endpoint `POST /api/lotes`, que recibe solo el campo `codigo`:
+
+   ```bash
+   curl -X POST http://localhost:3000/api/lotes \
+     -H "Content-Type: application/json" \
+     -d '{"codigo":"PRUEBA-01"}'
+   ```
+
+   La respuesta incluye el `id` del lote; anotarlo. Si no se recuerda, `GET /api/lotes` lista los existentes.
 2. Registrar el tarro muestra del lote. Es la primera lectura y el script termina al registrarla:
 
    ```bash
