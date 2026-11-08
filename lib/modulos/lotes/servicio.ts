@@ -1,4 +1,5 @@
 import pool from '@/lib/db';
+import { insertarLote } from './repositorio';
 
 // Trae todos los lotes, más recientes primero
 export async function obtenerLotes() {
@@ -10,11 +11,7 @@ export async function obtenerLotes() {
 
 // Crea un lote nuevo con el código dado (ej. "#005_Azul_Cielo")
 export async function crearLote(codigo: string) {
-  const resultado = await pool.query(
-    'INSERT INTO lotes (codigo) VALUES ($1) RETURNING *',
-    [codigo]
-  );
-  return resultado.rows[0];
+  return insertarLote(codigo);
 }
 
 // Trae los lotes con su color de muestra y desviación promedio, para la pantalla principal
