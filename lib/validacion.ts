@@ -27,3 +27,12 @@ export function coincidenColorHexYRgb(colorHex: string, colorRgb: [number, numbe
     '#' + colorRgb.map((canal) => canal.toString(16).padStart(2, '0')).join('');
   return colorHexDesdeRgb.toLowerCase() === colorHex.toLowerCase();
 }
+
+// Largo máximo del código de un lote (columna lotes.codigo, VARCHAR(50))
+export const LONGITUD_MAXIMA_CODIGO_LOTE = 50;
+
+// Indica si el texto supera el largo máximo del código de un lote.
+// Cuenta caracteres igual que PostgreSQL (un emoji cuenta como uno)
+export function excedeLongitudCodigoLote(codigo: string): boolean {
+  return Array.from(codigo).length > LONGITUD_MAXIMA_CODIGO_LOTE;
+}
