@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+import InsigniaResultado from '@/app/componentes/InsigniaResultado';
+import { formatearDeltaE } from '@/lib/formato';
 import { obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
 import {
   obtenerLecturasRecientesDeLote,
@@ -54,18 +56,13 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
             >
               {ultimoTarro && (
                 <>
-                  <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs">
-                    ΔE {ultimoTarro.desviacion_delta_e}
+                  <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs tabular-nums">
+                    ΔE {formatearDeltaE(ultimoTarro.desviacion_delta_e)}
                   </span>
-                  <span
-                    className={`px-2 py-1 rounded text-xs uppercase font-bold ${
-                      ultimoTarro.resultado === 'Aprobado'
-                        ? 'bg-secondary-container text-secondary-fixed'
-                        : 'bg-primary-container text-on-primary-container'
-                    }`}
-                  >
-                    {ultimoTarro.resultado}
-                  </span>
+                  <InsigniaResultado
+                    resultado={ultimoTarro.resultado}
+                    desviacionDeltaE={ultimoTarro.desviacion_delta_e}
+                  />
                 </>
               )}
             </div>
@@ -90,23 +87,27 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
               {lecturasRecientes.map((tarro) => (
                 <tr key={tarro.id_tarro} className="border-t border-surface-container-highest">
                   <td className="px-5 py-3">#TR-{tarro.id_tarro}</td>
-                  <td className="px-5 py-3 font-bold">{tarro.desviacion_delta_e}</td>
-                  <td className="px-5 py-3">
-                    {new Date(tarro.timestamp).toLocaleTimeString()}
+                  <td className="px-5 py-3 font-bold tabular-nums">
+                    {formatearDeltaE(tarro.desviacion_delta_e)}
                   </td>
                   <td className="px-5 py-3">
-                    <span
-                      className={`px-3 py-1 rounded text-xs uppercase font-bold ${
-                        tarro.resultado === 'Aprobado'
-                          ? 'bg-secondary-container text-secondary-fixed'
-                          : 'bg-primary-container text-on-primary-container'
-                      }`}
-                    >
-                      {tarro.resultado}
-                    </span>
+                    {new Date(tarro.timestamp).toLocaleTimeString('es-CO')}
+                  </td>
+                  <td className="px-5 py-3">
+                    <InsigniaResultado
+                      resultado={tarro.resultado}
+                      desviacionDeltaE={tarro.desviacion_delta_e}
+                    />
                   </td>
                 </tr>
               ))}
+              {lecturasRecientes.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-5 py-6 text-center text-on-surface-variant">
+                    Aún no hay lecturas en este lote.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
