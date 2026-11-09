@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
+import ControlCaptura from '@/app/componentes/ControlCaptura';
 import InsigniaResultado from '@/app/componentes/InsigniaResultado';
 import { formatearDeltaE, formatearFechaHora } from '@/lib/formato';
 import { obtenerAlertasDeLote } from '@/lib/modulos/alertas/servicio';
-import { obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
+import { obtenerCapturaActiva, obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
 import {
   obtenerLecturasRecientesDeLote,
   obtenerMuestraDeLote,
@@ -28,11 +29,12 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
     notFound();
   }
 
-  const [lote, muestra, lecturasRecientes, alertas] = await Promise.all([
+  const [lote, muestra, lecturasRecientes, alertas, capturaActiva] = await Promise.all([
     obtenerLotePorId(loteId),
     obtenerMuestraDeLote(loteId),
     obtenerLecturasRecientesDeLote(loteId, CANTIDAD_LECTURAS_RECIENTES),
     obtenerAlertasDeLote(loteId) as Promise<AlertaLote[]>,
+    obtenerCapturaActiva(),
   ]);
 
   if (!lote) {
@@ -43,6 +45,9 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
   const estaPausado = lote.estado === 'Pausado';
   // Las alertas vienen de la más reciente a la más antigua: la primera roja es la que pausó el lote
   const alertaQuePauso = alertas.find((alerta) => alerta.nivel === 'Roja');
+  // Solo interesa la captura activa si es de otro lote: la de este lote ya está en lote.modo_captura
+  const capturaDeOtroLote =
+    capturaActiva && capturaActiva.loteId !== lote.id ? capturaActiva : null;
 
   return (
     <main className="min-h-screen bg-surface text-on-surface">
@@ -53,6 +58,14 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
         </div>
 
         {estaPausado && <AvisoLotePausado alertaQuePauso={alertaQuePauso} />}
+
+        <ControlCaptura
+          loteId={lote.id}
+          estado={lote.estado}
+          modoCaptura={lote.modo_captura}
+          tieneMuestra={Boolean(muestra)}
+          capturaDeOtroLote={capturaDeOtroLote}
+        />
 
         {/* Comparativa muestra vs último tarro */}
         <div className="grid grid-cols-2 gap-4 bg-surface-container rounded-lg overflow-hidden">
