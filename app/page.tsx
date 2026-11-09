@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { connection } from 'next/server';
+import type { ModoCaptura } from '@/lib/modulos/lotes/reglas';
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
 import FormularioAgregarLote from './componentes/FormularioAgregarLote';
 
@@ -7,9 +8,17 @@ interface LoteConResumen {
   id: number;
   codigo: string;
   estado: string;
+  modo_captura: ModoCaptura;
   muestra_hex: string | null;
   desviacion_promedio: string | number | null;
 }
+
+// Texto del indicador de la tarjeta cuando el lote está usando el sensor; sin indicador si está Inactivo
+const TEXTOS_MODO_CAPTURA: Record<ModoCaptura, string | null> = {
+  Inactivo: null,
+  Muestra: 'Esperando muestra',
+  Recoleccion: 'Recolectando lecturas',
+};
 
 // Pantalla principal: muestra todos los lotes en producción
 export default async function PaginaPrincipal() {
@@ -42,6 +51,7 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
   const colorMuestra = lote.muestra_hex || '#555555';
   const desviacion = lote.desviacion_promedio ?? '—';
   const estaPausado = lote.estado === 'Pausado';
+  const textoCaptura = TEXTOS_MODO_CAPTURA[lote.modo_captura];
 
   return (
     <article className="bg-surface-container rounded-lg overflow-hidden shadow-md">
@@ -50,15 +60,23 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
           <span className="text-xs uppercase text-on-surface-variant block">ID Lote</span>
           <span className="font-headline text-lg font-bold">{lote.codigo}</span>
         </div>
-        <span
-          className={`px-3 py-1 text-xs uppercase rounded ${
-            estaPausado
-              ? 'bg-primary-container text-on-primary-container'
-              : 'bg-secondary-container text-secondary-fixed'
-          }`}
-        >
-          {lote.estado}
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <span
+            className={`px-3 py-1 text-xs uppercase rounded ${
+              estaPausado
+                ? 'bg-primary-container text-on-primary-container'
+                : 'bg-secondary-container text-secondary-fixed'
+            }`}
+          >
+            {lote.estado}
+          </span>
+          {textoCaptura && (
+            <span className="px-3 py-1 text-xs uppercase rounded font-bold bg-tertiary-container text-on-tertiary-container">
+              <span aria-hidden="true">● </span>
+              {textoCaptura}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="p-5 space-y-4">
