@@ -72,9 +72,13 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
           <div>
             <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">Muestra Patrón</div>
             <div
-              className="h-40"
+              className="h-40 flex items-end p-3"
               style={{ backgroundColor: muestra?.resultado_hex || '#555' }}
-            />
+            >
+              <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs">
+                {muestra ? `Ref. ${muestra.resultado_hex}` : 'Sin muestra registrada'}
+              </span>
+            </div>
           </div>
           <div>
             <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">Último Tarro Leído</div>
