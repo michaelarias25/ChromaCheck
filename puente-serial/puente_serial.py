@@ -4,8 +4,12 @@ Lee las lecturas que el Arduino envía por el puerto serial con el formato
 "LECTURA;R;G;B" y las reenvía al endpoint POST /api/tarros.
 
 Uso:
+    python puente_serial.py --puerto COM3 --automatico
     python puente_serial.py --puerto COM3 --lote 1
     python puente_serial.py --puerto COM3 --lote 1 --muestra
+
+Con --automatico, el lote y el modo (muestra o recolección) los elige la web, y el
+puente los consulta en GET /api/captura/activa antes de enviar cada lectura.
 """
 import argparse
 import logging
@@ -277,18 +281,38 @@ def ejecutar_puente(puerto, lote_id, url_api, es_muestra=False):
                 return registrada
 
 
-def leer_argumentos():
+def ejecutar_puente_automatico(puerto, url_api):
+    """Lee el puerto y envía cada lectura al lote y modo que eligió la web.
+
+    No termina solo: sigue escuchando hasta que se interrumpa con Ctrl+C.
+    """
+    with abrir_puerto(puerto) as conexion:
+        verificar_calibracion(conexion)
+        logging.info('Escuchando %s a %s baudios en modo automático (el lote y el modo se '
+                     'eligen en la web); API %s', puerto, VELOCIDAD_SERIAL, url_api)
+        while True:
+            procesar_linea_automatica(leer_linea(conexion), url_api)
+
+
+def leer_argumentos(argumentos=None):
+    """Lee los argumentos de la línea de comandos (o la lista dada, en las pruebas)."""
     lector = argparse.ArgumentParser(
         description='Reenvía las lecturas del sensor (puerto serial) a la API de ChromaCheck.')
     lector.add_argument('--puerto', required=True,
                         help='puerto del Arduino, por ejemplo COM3 o /dev/ttyUSB0')
-    lector.add_argument('--lote', required=True, type=int,
-                        help='id del lote al que pertenecen las lecturas')
+    destino = lector.add_mutually_exclusive_group(required=True)
+    destino.add_argument('--automatico', action='store_true',
+                         help='envía cada lectura al lote y modo de captura elegidos en la web')
+    destino.add_argument('--lote', type=int,
+                         help='id del lote al que pertenecen las lecturas (modo manual)')
     lector.add_argument('--url', default=URL_API_POR_DEFECTO,
                         help=f'dirección base de la API (por defecto {URL_API_POR_DEFECTO})')
     lector.add_argument('--muestra', action='store_true',
-                        help='registra la primera lectura como tarro muestra del lote y termina')
-    return lector.parse_args()
+                        help='con --lote: registra la primera lectura como tarro muestra y termina')
+    leidos = lector.parse_args(argumentos)
+    if leidos.automatico and leidos.muestra:
+        lector.error('--muestra no se usa con --automatico: el modo lo elige la web')
+    return leidos
 
 
 def main():
@@ -296,8 +320,11 @@ def main():
                         datefmt='%H:%M:%S')
     argumentos = leer_argumentos()
     try:
-        registrada = ejecutar_puente(argumentos.puerto, argumentos.lote, argumentos.url,
-                                     argumentos.muestra)
+        if argumentos.automatico:
+            registrada = ejecutar_puente_automatico(argumentos.puerto, argumentos.url)
+        else:
+            registrada = ejecutar_puente(argumentos.puerto, argumentos.lote, argumentos.url,
+                                         argumentos.muestra)
     except serial.SerialException as error:
         logging.error('Falló el puerto serial %s: %s', argumentos.puerto, error)
         return 1
