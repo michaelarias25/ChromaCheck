@@ -42,7 +42,7 @@ Los errores internos responden `500` con `"Error interno del servidor"`, igual q
 
 ## Protección de rutas
 
-`proxy.ts` revisa la cookie `sesion` en cada página. Sin sesión válida redirige a `/login`. Las rutas `/api/**` no pasan por el proxy: el script de Python que envía las lecturas del sensor (historia 06) no inicia sesión. Los endpoints de escritura que usa solo la web verifican la sesión por su cuenta con `verificarTokenSesion` y responden `401` sin ella; hoy es el caso de `POST /api/lotes`.
+`proxy.ts` revisa la cookie `sesion` en cada página. Sin sesión válida redirige a `/login`. Las rutas `/api/**` no pasan por el proxy: el script de Python que envía las lecturas del sensor (historia 06) no inicia sesión. Los endpoints de escritura que usa solo la web verifican la sesión por su cuenta con `verificarTokenSesion` y responden `401` sin ella; hoy es el caso de `POST /api/lotes` y `PATCH /api/lotes/[id]/captura`.
 
 ## Crear un usuario
 
