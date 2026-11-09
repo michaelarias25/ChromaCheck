@@ -19,6 +19,12 @@ export interface LoteConMuestra extends Lote {
   tiene_muestra: boolean;
 }
 
+export interface LoteConResumen extends Lote {
+  muestra_hex: string | null;
+  // PostgreSQL devuelve NUMERIC como texto; null si el lote aún no tiene lecturas
+  desviacion_promedio: string | null;
+}
+
 // Indica si el error de PostgreSQL es una violación de unicidad (opcionalmente, de un índice concreto)
 function esViolacionDeUnicidad(error: unknown, nombreIndice?: string): boolean {
   if (typeof error !== 'object' || error === null) return false;
@@ -102,4 +108,33 @@ export async function pausarLoteYDetenerCaptura(loteId: number): Promise<Lote | 
     [MODO_CAPTURA_DETENIDO, loteId]
   );
   return resultado.rows[0] ?? null;
+}
+
+// Trae todos los lotes, más recientes primero
+export async function buscarLotes(): Promise<Lote[]> {
+  const resultado = await pool.query<Lote>('SELECT * FROM lotes ORDER BY fecha_inicio DESC');
+  return resultado.rows;
+}
+
+// Trae un lote por su id; null si no existe
+export async function buscarLotePorId(id: number): Promise<Lote | null> {
+  const resultado = await pool.query<Lote>('SELECT * FROM lotes WHERE id = $1', [id]);
+  return resultado.rows[0] || null;
+}
+
+// Trae los lotes con el color de su muestra y su desviación promedio, más recientes primero
+export async function buscarLotesConResumen(): Promise<LoteConResumen[]> {
+  const resultado = await pool.query<LoteConResumen>(`
+    SELECT
+      l.id,
+      l.codigo,
+      l.estado,
+      l.modo_captura,
+      l.fecha_inicio,
+      (SELECT resultado_hex FROM tarros WHERE lote_id = l.id AND es_muestra = true LIMIT 1) AS muestra_hex,
+      (SELECT ROUND(AVG(desviacion_delta_e), 2) FROM tarros WHERE lote_id = l.id AND es_muestra = false) AS desviacion_promedio
+    FROM lotes l
+    ORDER BY l.fecha_inicio DESC
+  `);
+  return resultado.rows;
 }
