@@ -97,13 +97,14 @@ export async function obtenerCapturaActiva(): Promise<CapturaActiva | null> {
   return { loteId: lote.id, codigo: lote.codigo, modo: lote.modo_captura };
 }
 
-// Trae los lotes con su color de muestra y desviación promedio, para la pantalla principal
+// Trae los lotes con su modo de captura, color de muestra y desviación promedio, para la pantalla principal
 export async function obtenerLotesConResumen() {
   const resultado = await pool.query(`
     SELECT
       l.id,
       l.codigo,
       l.estado,
+      l.modo_captura,
       l.fecha_inicio,
       (SELECT resultado_hex FROM tarros WHERE lote_id = l.id AND es_muestra = true LIMIT 1) AS muestra_hex,
       (SELECT ROUND(AVG(desviacion_delta_e), 2) FROM tarros WHERE lote_id = l.id AND es_muestra = false) AS desviacion_promedio
