@@ -16,7 +16,15 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
    npm install
    ```
 
-2. Copiar `.env.example` como `.env.local` y escribir la cadena de conexión de Neon en `DATABASE_URL`. El archivo `.env.local` no se sube al repositorio.
+2. Copiar `.env.example` como `.env.local` y completar:
+   - `DATABASE_URL`: la cadena de conexión de Neon.
+   - `AUTH_SECRET`: la clave para firmar la cookie de sesión, de mínimo 32 caracteres. Para generar una:
+
+     ```bash
+     node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+     ```
+
+   El archivo `.env.local` no se sube al repositorio.
 
 3. Iniciar el servidor de desarrollo:
 
