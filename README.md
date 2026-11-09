@@ -58,7 +58,7 @@ public/               Logo e imágenes
 
 | Tabla | Columnas |
 | --- | --- |
-| `lotes` | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `fecha_inicio` |
+| `lotes` | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `modo_captura` (`Inactivo` por defecto, `Muestra` o `Recoleccion`; ver [docs/api.md](docs/api.md)), `fecha_inicio` |
 | `tarros` | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp` |
 | `alertas` | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp` |
 | `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion` |
@@ -67,6 +67,20 @@ El código único de `lotes` se garantiza con este índice (probado primero en e
 
 ```sql
 CREATE UNIQUE INDEX lotes_codigo_unico ON lotes (LOWER(TRIM(codigo)));
+```
+
+El modo de captura (qué lote recibe las lecturas del único sensor) se agregó así, también probado primero en el SQL Editor de Neon:
+
+```sql
+ALTER TABLE lotes
+  ADD COLUMN modo_captura VARCHAR(20) NOT NULL DEFAULT 'Inactivo'
+  CONSTRAINT lotes_modo_captura_valido
+    CHECK (modo_captura IN ('Inactivo', 'Muestra', 'Recoleccion'));
+
+-- Solo un lote a la vez puede tener un modo distinto de 'Inactivo'
+CREATE UNIQUE INDEX lotes_un_lote_capturando
+  ON lotes ((true))
+  WHERE modo_captura <> 'Inactivo';
 ```
 
 ## Integrantes
