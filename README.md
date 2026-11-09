@@ -34,12 +34,14 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 
 ## Comandos
 
-| Comando         | Uso                                               |
-| --------------- | ------------------------------------------------- |
-| `npm run dev`   | Servidor de desarrollo en <http://localhost:3000> |
-| `npm run build` | Compilación de producción                         |
-| `npm run start` | Servidor de producción (después de `build`)       |
-| `npm run lint`  | Revisión con ESLint                               |
+| Comando                   | Uso                                                                     |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `npm run dev`             | Servidor de desarrollo en <http://localhost:3000>                       |
+| `npm run build`           | Compilación de producción                                               |
+| `npm run start`           | Servidor de producción (después de `build`)                             |
+| `npm run lint`            | Revisión con ESLint                                                     |
+| `npm run formato`         | Aplica el formato de Prettier                                           |
+| `npm run formato:revisar` | Revisa el formato sin cambiar archivos (lo exige la Definition of Done) |
 
 ### Crear un usuario
 
