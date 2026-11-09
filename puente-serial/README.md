@@ -18,7 +18,9 @@ pip install -r requirements.txt
 1. Con el servidor de ChromaCheck en marcha y el Arduino conectado, crear el lote desde la app: iniciar sesión y usar el botón **Agregar lote** de la pantalla principal. `POST /api/lotes` exige sesión, así que ya no se crea con `curl`. El `id` del lote aparece en la dirección al abrir **Ver Monitoreo de Lote** (`/lotes/<id>`); también lo devuelve `GET /api/lotes`.
 2. **Antes de usar `--lote`, poner el lote en el modo de captura correspondiente.** Hay un solo sensor: la API solo acepta la muestra si el lote está en modo `Muestra`, y las lecturas si está en modo `Recoleccion`. En cualquier otro caso responde 409 y el script solo registra el error en consola. Solo un lote a la vez puede estar capturando (ver `docs/api.md`, sección *Captura del sensor*).
 
-   El modo se cambia con `PATCH /api/lotes/<id>/captura`, que exige sesión. Mientras la app no tenga un botón para esto, se hace con `curl.exe` desde PowerShell (escribir `curl.exe`, no `curl`, que en PowerShell es otro comando). Primero se inicia sesión y la cookie se guarda en `cookies.txt`:
+   El modo se cambia desde la app, en la sección **Captura del sensor** de `/lotes/<id>`: **Registrar muestra** pone el lote en `Muestra`, **Iniciar recolección** en `Recoleccion`, y **Cancelar** o **Detener recolección** en `Inactivo`.
+
+   Sin navegador, se puede usar `PATCH /api/lotes/<id>/captura`, que exige sesión, con `curl.exe` desde PowerShell (escribir `curl.exe`, no `curl`, que en PowerShell es otro comando). Primero se inicia sesión y la cookie se guarda en `cookies.txt`:
 
    ```powershell
    curl.exe -c cookies.txt -H "Content-Type: application/json" -d '{\"nombreUsuario\":\"<usuario>\",\"contrasena\":\"<contrasena>\"}' http://localhost:3000/api/auth/login
@@ -32,13 +34,13 @@ pip install -r requirements.txt
    python puente_serial.py --puerto COM3 --lote 1 --muestra
    ```
 
-4. Poner el lote en modo `Recoleccion` (el mismo `PATCH` del paso 2, con el modo `Recoleccion`) y registrar las lecturas de los demás tarros. El script queda escuchando hasta que se detenga con `Ctrl+C`. Si una alerta roja pausa el lote, su modo pasa a `Inactivo` y las lecturas siguientes se rechazan:
+4. Poner el lote en modo `Recoleccion` (botón **Iniciar recolección**) y registrar las lecturas de los demás tarros. El script queda escuchando hasta que se detenga con `Ctrl+C`. Si una alerta roja pausa el lote, su modo pasa a `Inactivo` y las lecturas siguientes se rechazan:
 
    ```bash
    python puente_serial.py --puerto COM3 --lote 1
    ```
 
-5. Al terminar, detener la captura con el mismo `PATCH` y el modo `Inactivo` para liberar el sensor.
+5. Al terminar, detener la captura (botón **Detener recolección**) para liberar el sensor.
 
 | Opción | Descripción |
 | --- | --- |
