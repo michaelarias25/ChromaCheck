@@ -17,8 +17,8 @@ La contraseña nunca se guarda en texto plano: se guarda el hash `sal:hash` gene
 
 ## Variables de entorno (`.env.local`)
 
-| Variable | Uso |
-|---|---|
+| Variable      | Uso                                                          |
+| ------------- | ------------------------------------------------------------ |
 | `AUTH_SECRET` | Clave para firmar la cookie de sesión. Mínimo 32 caracteres. |
 
 ## Rutas de la API
@@ -27,12 +27,12 @@ La contraseña nunca se guarda en texto plano: se guarda el hash `sal:hash` gene
 
 Cuerpo: `{ "nombreUsuario": string, "contrasena": string }`
 
-| Caso | Respuesta |
-|---|---|
-| Credenciales correctas | `200` `{ exito: true, datos: { id, nombreUsuario } }` y cookie `sesion` (HttpOnly) |
-| Faltan campos | `400` `{ exito: false, error: "Ingresa usuario y contraseña" }` |
-| El cuerpo no es un objeto JSON | `400` `{ exito: false, error: "El cuerpo de la petición debe ser un objeto JSON" }` |
-| Credenciales incorrectas | `401` `{ exito: false, error: "Usuario o contraseña incorrectos" }` (no indica cuál campo falló) |
+| Caso                           | Respuesta                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Credenciales correctas         | `200` `{ exito: true, datos: { id, nombreUsuario } }` y cookie `sesion` (HttpOnly)               |
+| Faltan campos                  | `400` `{ exito: false, error: "Ingresa usuario y contraseña" }`                                  |
+| El cuerpo no es un objeto JSON | `400` `{ exito: false, error: "El cuerpo de la petición debe ser un objeto JSON" }`              |
+| Credenciales incorrectas       | `401` `{ exito: false, error: "Usuario o contraseña incorrectos" }` (no indica cuál campo falló) |
 
 ### `POST /api/auth/logout`
 

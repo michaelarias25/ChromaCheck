@@ -38,7 +38,11 @@ function convertirHexABytes(hex: string): Uint8Array<ArrayBuffer> | null {
 export async function crearTokenSesion(idUsuario: number): Promise<string> {
   const expiraEn = Math.floor(Date.now() / 1000) + DURACION_SESION_SEGUNDOS;
   const carga = `${idUsuario}.${expiraEn}`;
-  const firma = await crypto.subtle.sign('HMAC', await obtenerClaveFirma(), codificador.encode(carga));
+  const firma = await crypto.subtle.sign(
+    'HMAC',
+    await obtenerClaveFirma(),
+    codificador.encode(carga)
+  );
   return `${carga}.${convertirBytesAHex(firma)}`;
 }
 

@@ -30,10 +30,9 @@ function esViolacionDeUnicidad(error: unknown, nombreIndice?: string): boolean {
 // (índice único lotes_codigo_unico, que ignora mayúsculas y espacios en los extremos)
 export async function insertarLote(codigo: string): Promise<Lote | null> {
   try {
-    const resultado = await pool.query<Lote>(
-      'INSERT INTO lotes (codigo) VALUES ($1) RETURNING *',
-      [codigo]
-    );
+    const resultado = await pool.query<Lote>('INSERT INTO lotes (codigo) VALUES ($1) RETURNING *', [
+      codigo,
+    ]);
     return resultado.rows[0];
   } catch (error) {
     if (esViolacionDeUnicidad(error)) return null;
@@ -56,10 +55,9 @@ export async function buscarLoteConMuestra(loteId: number): Promise<LoteConMuest
 // Trae el lote que está capturando (modo distinto de 'Inactivo'); null si ninguno.
 // El índice lotes_un_lote_capturando garantiza que hay como máximo uno
 export async function buscarLoteCapturando(): Promise<Lote | null> {
-  const resultado = await pool.query<Lote>(
-    'SELECT * FROM lotes WHERE modo_captura <> $1 LIMIT 1',
-    [MODO_CAPTURA_DETENIDO]
-  );
+  const resultado = await pool.query<Lote>('SELECT * FROM lotes WHERE modo_captura <> $1 LIMIT 1', [
+    MODO_CAPTURA_DETENIDO,
+  ]);
   return resultado.rows[0] ?? null;
 }
 

@@ -18,7 +18,8 @@ export async function POST(peticion: Request) {
       return responderError('El cuerpo de la petición debe ser un objeto JSON', 400);
     }
 
-    const nombreUsuario = typeof cuerpo.nombreUsuario === 'string' ? cuerpo.nombreUsuario.trim() : '';
+    const nombreUsuario =
+      typeof cuerpo.nombreUsuario === 'string' ? cuerpo.nombreUsuario.trim() : '';
     const contrasena = typeof cuerpo.contrasena === 'string' ? cuerpo.contrasena : '';
     if (!nombreUsuario || !contrasena) {
       return responderError('Ingresa usuario y contraseña', 400);

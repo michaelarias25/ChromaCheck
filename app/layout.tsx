@@ -1,36 +1,32 @@
-import type { Metadata } from "next";
-import { Inter, Montserrat } from "next/font/google";
-import "./globals.css";
-import Image from "next/image";
-import Link from "next/link";
-import BotonCerrarSesion from "./componentes/BotonCerrarSesion";
+import type { Metadata } from 'next';
+import { Inter, Montserrat } from 'next/font/google';
+import './globals.css';
+import Image from 'next/image';
+import Link from 'next/link';
+import BotonCerrarSesion from './componentes/BotonCerrarSesion';
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  variable: '--font-inter',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
 });
 
 const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-  weight: ["600", "700"],
+  variable: '--font-montserrat',
+  subsets: ['latin'],
+  weight: ['600', '700'],
 });
 
 export const metadata: Metadata = {
-  title: "Chroma Check",
-  description: "Sistema de control espectrométrico industrial",
+  title: 'Chroma Check',
+  description: 'Sistema de control espectrométrico industrial',
 };
 
-export default function PlantillaPrincipal({ children }: LayoutProps<"/">) {
+export default function PlantillaPrincipal({ children }: LayoutProps<'/'>) {
   return (
-    <html
-      lang="es"
-      className={`${inter.variable} ${montserrat.variable} h-full antialiased`}
-    >
+    <html lang="es" className={`${inter.variable} ${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <header className="h-16 px-8 flex items-center justify-between border-b-2 border-surface-container-highest bg-surface-container-lowest">
-          
           <div className="flex items-center h-10 w-auto">
             <Image
               src="/logo.png"
@@ -41,17 +37,17 @@ export default function PlantillaPrincipal({ children }: LayoutProps<"/">) {
               className="h-full w-auto object-contain"
             />
           </div>
-          
+
           <nav className="flex items-center gap-3">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="px-4 h-9 bg-surface-container-high text-on-surface-variant flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider transition hover:bg-surface-container-highest"
             >
               Lotes
             </Link>
 
-            <Link 
-              href="/historial" 
+            <Link
+              href="/historial"
               className="px-4 h-9 bg-surface-container-high text-on-surface-variant flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider transition hover:opacity-90"
             >
               Historial
@@ -61,7 +57,7 @@ export default function PlantillaPrincipal({ children }: LayoutProps<"/">) {
           </nav>
         </header>
         {children}
-        </body>
+      </body>
     </html>
   );
 }

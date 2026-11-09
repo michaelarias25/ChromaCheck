@@ -66,9 +66,7 @@ export async function obtenerHistorialTarros(pagina: number, tarrosPorPagina: nu
 function convertirRgbALab(r: number, g: number, b: number) {
   const linearizar = (canal: number) => {
     const valor = canal / 255;
-    return valor > 0.04045
-      ? Math.pow((valor + 0.055) / 1.055, 2.4)
-      : valor / 12.92;
+    return valor > 0.04045 ? Math.pow((valor + 0.055) / 1.055, 2.4) : valor / 12.92;
   };
 
   const rLineal = linearizar(r);
@@ -104,8 +102,8 @@ export function calcularDesviacionDeltaE(
 
   const deltaE = Math.sqrt(
     Math.pow(labMuestra.l - labTarro.l, 2) +
-    Math.pow(labMuestra.a - labTarro.a, 2) +
-    Math.pow(labMuestra.b - labTarro.b, 2)
+      Math.pow(labMuestra.a - labTarro.a, 2) +
+      Math.pow(labMuestra.b - labTarro.b, 2)
   );
 
   return Math.round(deltaE * 100) / 100;
