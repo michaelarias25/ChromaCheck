@@ -9,6 +9,7 @@ from puente_serial import (
     enviar_lectura,
     interpretar_linea,
     procesar_linea,
+    verificar_calibracion,
 )
 
 
@@ -141,6 +142,71 @@ class PruebasEnviarLectura(unittest.TestCase):
             self.assertFalse(procesar_linea('LECTURA;1;2;3', 1, self.url))
         ApiFalsa.estado = 201
         self.assertTrue(procesar_linea('LECTURA;1;2;3', 1, self.url))
+
+
+class PuertoSimulado:
+    """Imita el puerto serial: entrega las líneas configuradas y guarda lo que se escribe.
+
+    Cuando se acaban las líneas, readline devuelve b'' como un puerto real al
+    agotar su espera; con al_terminar se puede lanzar una excepción para cortar
+    los bucles infinitos del puente.
+    """
+
+    def __init__(self, lineas, al_terminar=None):
+        self.lineas = [linea.encode('utf-8') + b'\r\n' for linea in lineas]
+        self.escrito = b''
+        self.al_terminar = al_terminar
+
+    def write(self, datos):
+        self.escrito += datos
+
+    def flush(self):
+        pass
+
+    def readline(self):
+        if self.lineas:
+            return self.lineas.pop(0)
+        if self.al_terminar:
+            raise self.al_terminar
+        return b''
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *argumentos):
+        return False
+
+
+class PruebasVerificarCalibracion(unittest.TestCase):
+    def test_envia_calibrar_ver(self):
+        puerto = PuertoSimulado(['CALIBRACION;ESTADO;VALIDA'])
+        verificar_calibracion(puerto, tiempo_espera=1)
+        self.assertEqual(puerto.escrito, b'CALIBRAR;VER\n')
+
+    def test_sensor_calibrado_se_informa(self):
+        puerto = PuertoSimulado(['CALIBRACION;ESTADO;VALIDA', 'CALIBRACION;BLANCO;1;2;3;4'])
+        with self.assertLogs(level='INFO') as registro:
+            self.assertEqual(verificar_calibracion(puerto, tiempo_espera=1), 'VALIDA')
+        self.assertIn('válida', registro.output[0])
+
+    def test_sensor_sin_calibrar_muestra_un_aviso_claro(self):
+        puerto = PuertoSimulado(['AVISO;LISTO', 'CALIBRACION;ESTADO;SIN_CALIBRAR'])
+        with self.assertLogs(level='WARNING') as registro:
+            self.assertEqual(verificar_calibracion(puerto, tiempo_espera=1), 'SIN_CALIBRAR')
+        self.assertEqual(len(registro.records), 1)
+        self.assertIn('NO ESTÁ CALIBRADO', registro.output[0])
+        self.assertIn('CALIBRAR;GUARDAR', registro.output[0])
+
+    def test_sin_respuesta_avisa_y_no_bloquea(self):
+        with self.assertLogs(level='WARNING') as registro:
+            self.assertIsNone(verificar_calibracion(PuertoSimulado([]), tiempo_espera=0.1))
+        self.assertIn('no respondió a CALIBRAR;VER', registro.output[0])
+
+    def test_lectura_durante_la_verificacion_se_descarta_con_aviso(self):
+        puerto = PuertoSimulado(['LECTURA;1;2;3', 'CALIBRACION;ESTADO;VALIDA'])
+        with self.assertLogs(level='WARNING') as registro:
+            self.assertEqual(verificar_calibracion(puerto, tiempo_espera=1), 'VALIDA')
+        self.assertIn('LECTURA;1;2;3', registro.output[0])
 
 
 if __name__ == '__main__':
