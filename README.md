@@ -41,6 +41,16 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 | `npm run start` | Servidor de producción (después de `build`) |
 | `npm run lint` | Revisión con ESLint |
 
+### Crear un usuario
+
+No hay registro público: los usuarios se crean desde la terminal con `scripts/crear-usuario.ts` (detalles en [docs/autenticacion.md](docs/autenticacion.md)):
+
+```bash
+node --env-file=.env.local --experimental-strip-types scripts/crear-usuario.ts <nombre_usuario> <contrasena>
+```
+
+Requiere **Node 22.6 o superior**: es la primera versión con `--experimental-strip-types`, que permite ejecutar el archivo TypeScript sin compilarlo.
+
 ## Rutas
 
 | Ruta | Pantalla |
