@@ -1,0 +1,8 @@
+# Código con su propio formateador: clang-format (firmware) y PEP 8 (puente serial)
+firmware/
+puente-serial/
+
+# Generado o instalado
+.next/
+node_modules/
+package-lock.json
