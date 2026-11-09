@@ -4,11 +4,14 @@ import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from puente_serial import (
+    ErrorConsultaCaptura,
     construir_cuerpo,
+    consultar_captura_activa,
     convertir_rgb_a_hex,
     enviar_lectura,
     interpretar_linea,
     procesar_linea,
+    procesar_linea_automatica,
     verificar_calibracion,
 )
 
@@ -68,6 +71,21 @@ class ApiFalsa(BaseHTTPRequestHandler):
     estado = 201
     cuerpo_respuesta = b'{"exito": true, "datos": {}}'
     cuerpos_recibidos = []
+    # Respuesta de GET /api/captura/activa (modo automático)
+    estado_captura = 200
+    captura_activa = None
+    consultas_captura = 0
+
+    def do_GET(self):
+        ApiFalsa.consultas_captura += 1
+        estado = ApiFalsa.estado_captura
+        cuerpo = json.dumps({'exito': True, 'datos': ApiFalsa.captura_activa}).encode('utf-8')
+        if self.path != '/api/captura/activa':
+            estado, cuerpo = 404, b'{"exito": false, "error": "Ruta inexistente"}'
+        self.send_response(estado)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(cuerpo)
 
     def do_POST(self):
         largo = int(self.headers['Content-Length'])
@@ -142,6 +160,106 @@ class PruebasEnviarLectura(unittest.TestCase):
             self.assertFalse(procesar_linea('LECTURA;1;2;3', 1, self.url))
         ApiFalsa.estado = 201
         self.assertTrue(procesar_linea('LECTURA;1;2;3', 1, self.url))
+
+
+class PruebasModoAutomatico(unittest.TestCase):
+    """Contrato de docs/api.md: por cada lectura, consultar la captura activa y enviar."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.servidor = HTTPServer(('127.0.0.1', 0), ApiFalsa)
+        cls.url = f'http://127.0.0.1:{cls.servidor.server_port}'
+        threading.Thread(target=cls.servidor.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.shutdown()
+        cls.servidor.server_close()
+
+    def setUp(self):
+        ApiFalsa.estado = 201
+        ApiFalsa.cuerpo_respuesta = b'{"exito": true, "datos": {}}'
+        ApiFalsa.cuerpos_recibidos = []
+        ApiFalsa.estado_captura = 200
+        ApiFalsa.captura_activa = None
+        ApiFalsa.consultas_captura = 0
+
+    def poner_captura(self, modo):
+        ApiFalsa.captura_activa = {'loteId': 7, 'codigo': '#007_Prueba', 'modo': modo}
+
+    def test_linea_que_no_es_lectura_no_consulta_la_api(self):
+        self.assertIsNone(procesar_linea_automatica('AVISO;LISTO', self.url))
+        self.assertEqual(ApiFalsa.consultas_captura, 0)
+
+    def test_sin_captura_activa_descarta_la_lectura_y_lo_registra(self):
+        with self.assertLogs(level='WARNING') as registro:
+            self.assertFalse(procesar_linea_automatica('LECTURA;1;2;3', self.url))
+        self.assertIn('ningún lote está capturando', registro.output[0])
+        self.assertEqual(ApiFalsa.cuerpos_recibidos, [])
+
+    def test_modo_muestra_envia_la_muestra_del_lote_activo(self):
+        self.poner_captura('Muestra')
+        self.assertTrue(procesar_linea_automatica('LECTURA;227;83;55', self.url))
+        self.assertEqual(
+            ApiFalsa.cuerpos_recibidos,
+            [('/api/tarros', {'loteId': 7, 'resultadoHex': '#E35337', 'esMuestra': True})],
+        )
+
+    def test_modo_recoleccion_envia_la_lectura_con_rgb(self):
+        self.poner_captura('Recoleccion')
+        self.assertTrue(procesar_linea_automatica('LECTURA;227;83;55', self.url))
+        self.assertEqual(
+            ApiFalsa.cuerpos_recibidos,
+            [('/api/tarros', {'loteId': 7, 'resultadoHex': '#E35337', 'rgb': [227, 83, 55]})],
+        )
+
+    def test_consulta_la_captura_en_cada_lectura(self):
+        self.poner_captura('Muestra')
+        self.assertTrue(procesar_linea_automatica('LECTURA;1;2;3', self.url))
+        self.poner_captura('Recoleccion')
+        self.assertTrue(procesar_linea_automatica('LECTURA;4;5;6', self.url))
+        self.assertEqual(ApiFalsa.consultas_captura, 2)
+        self.assertIn('esMuestra', ApiFalsa.cuerpos_recibidos[0][1])
+        self.assertIn('rgb', ApiFalsa.cuerpos_recibidos[1][1])
+
+    def test_409_de_la_api_se_registra_y_sigue_leyendo(self):
+        self.poner_captura('Recoleccion')
+        ApiFalsa.estado = 409
+        ApiFalsa.cuerpo_respuesta = (
+            '{"exito": false, "error": "El lote está pausado por una alerta roja"}'.encode())
+        with self.assertLogs(level='ERROR') as registro:
+            self.assertFalse(procesar_linea_automatica('LECTURA;1;2;3', self.url))
+        self.assertIn('409', registro.output[0])
+        self.assertIn('pausado', registro.output[0])
+
+        ApiFalsa.estado = 201
+        self.assertTrue(procesar_linea_automatica('LECTURA;1;2;3', self.url))
+
+    def test_api_caida_se_registra_sin_lanzar_excepcion(self):
+        with self.assertLogs(level='ERROR') as registro:
+            self.assertFalse(procesar_linea_automatica('LECTURA;1;2;3', 'http://127.0.0.1:9'))
+        self.assertIn('no se pudo consultar la captura activa', registro.output[0])
+
+    def test_error_al_consultar_la_captura_descarta_la_lectura(self):
+        ApiFalsa.estado_captura = 500
+        with self.assertLogs(level='ERROR') as registro:
+            self.assertFalse(procesar_linea_automatica('LECTURA;1;2;3', self.url))
+        self.assertIn('500', registro.output[0])
+        self.assertEqual(ApiFalsa.cuerpos_recibidos, [])
+
+    def test_modo_desconocido_descarta_la_lectura(self):
+        self.poner_captura('Inactivo')
+        with self.assertLogs(level='ERROR'):
+            self.assertFalse(procesar_linea_automatica('LECTURA;1;2;3', self.url))
+        self.assertEqual(ApiFalsa.cuerpos_recibidos, [])
+
+    def test_consultar_captura_activa_devuelve_none_sin_captura(self):
+        self.assertIsNone(consultar_captura_activa(self.url))
+
+    def test_consultar_captura_activa_rechaza_formato_inesperado(self):
+        ApiFalsa.captura_activa = {'loteId': '7', 'modo': 'Muestra'}
+        with self.assertRaises(ErrorConsultaCaptura):
+            consultar_captura_activa(self.url)
 
 
 class PuertoSimulado:

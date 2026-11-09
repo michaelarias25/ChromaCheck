@@ -19,6 +19,10 @@ PREFIJO_LECTURA = 'LECTURA;'
 CANALES_POR_LECTURA = 3
 VALOR_MAXIMO_CANAL = 255
 RUTA_TARROS = '/api/tarros'
+RUTA_CAPTURA_ACTIVA = '/api/captura/activa'
+MODO_MUESTRA = 'Muestra'
+MODO_RECOLECCION = 'Recoleccion'
+MODOS_QUE_ENVIAN = (MODO_MUESTRA, MODO_RECOLECCION)
 TIEMPO_ESPERA_API_SEGUNDOS = 5
 LONGITUD_MAXIMA_MENSAJE = 200
 VELOCIDAD_SERIAL = 9600  # contrato con firmware/chromacheck_sensor
@@ -103,11 +107,11 @@ def enviar_lectura(url_api, cuerpo):
     return True
 
 
-def procesar_linea(linea, lote_id, url_api, es_muestra=False):
-    """Procesa una línea del puerto serial.
+def extraer_lectura(linea):
+    """Devuelve el RGB si la línea es una lectura, y registra en consola lo que interesa.
 
-    Devuelve None si la línea no es una lectura; si lo es, devuelve True o False
-    según la API la haya registrado o no.
+    Los avisos del Arduino (AVISO;...) se muestran; el resto de líneas que no son
+    lecturas se ignora en silencio.
     """
     rgb = interpretar_linea(linea)
     if rgb is None:
@@ -116,7 +120,86 @@ def procesar_linea(linea, lote_id, url_api, es_muestra=False):
         return None
 
     logging.info('Lectura recibida: RGB %s', rgb)
+    return rgb
+
+
+def procesar_linea(linea, lote_id, url_api, es_muestra=False):
+    """Procesa una línea del puerto serial para un lote fijo (--lote).
+
+    Devuelve None si la línea no es una lectura; si lo es, devuelve True o False
+    según la API la haya registrado o no.
+    """
+    rgb = extraer_lectura(linea)
+    if rgb is None:
+        return None
     return enviar_lectura(url_api, construir_cuerpo(lote_id, rgb, es_muestra))
+
+
+class ErrorConsultaCaptura(Exception):
+    """La API no respondió o no devolvió la captura activa con el formato esperado."""
+
+
+def consultar_captura_activa(url_api):
+    """Consulta GET /api/captura/activa: qué lote captura y en qué modo.
+
+    Devuelve {'loteId', 'codigo', 'modo'}, o None si ningún lote está capturando.
+    Lanza ErrorConsultaCaptura si la API no responde o la respuesta no es la esperada.
+    """
+    url = url_api.rstrip('/') + RUTA_CAPTURA_ACTIVA
+    try:
+        respuesta = requests.get(url, timeout=TIEMPO_ESPERA_API_SEGUNDOS)
+    except requests.RequestException as error:
+        raise ErrorConsultaCaptura(f'No se pudo contactar la API en {url}: {error}') from error
+
+    if respuesta.status_code != 200:
+        raise ErrorConsultaCaptura(
+            f'La API respondió {respuesta.status_code}: {extraer_mensaje_error(respuesta)}')
+
+    try:
+        captura = respuesta.json()['datos']
+    except (ValueError, KeyError, TypeError) as error:
+        raise ErrorConsultaCaptura('La API devolvió una respuesta inesperada') from error
+
+    if captura is None:
+        return None
+    es_captura_valida = (isinstance(captura, dict)
+                         and isinstance(captura.get('loteId'), int)
+                         and isinstance(captura.get('modo'), str))
+    if not es_captura_valida:
+        raise ErrorConsultaCaptura(f'La captura activa no tiene el formato esperado: {captura}')
+    return captura
+
+
+def procesar_linea_automatica(linea, url_api):
+    """Procesa una línea en modo automático: la web decide el lote y el modo.
+
+    Sigue el contrato de docs/api.md: por cada lectura consulta la captura activa
+    y la envía como muestra o como lectura. Devuelve None si la línea no es una
+    lectura; si lo es, True o False según haya quedado registrada.
+    """
+    rgb = extraer_lectura(linea)
+    if rgb is None:
+        return None
+
+    try:
+        captura = consultar_captura_activa(url_api)
+    except ErrorConsultaCaptura as error:
+        logging.error('Lectura descartada: no se pudo consultar la captura activa. %s', error)
+        return False
+
+    if captura is None:
+        logging.warning('Lectura descartada: ningún lote está capturando. Elige el lote y el '
+                        'modo en la pantalla del lote (/lotes/<id>).')
+        return False
+
+    modo = captura['modo']
+    if modo not in MODOS_QUE_ENVIAN:
+        logging.error('Lectura descartada: modo de captura desconocido "%s"', modo)
+        return False
+
+    es_muestra = modo == MODO_MUESTRA
+    logging.info('Lote %s (%s), modo %s', captura['loteId'], captura.get('codigo', '?'), modo)
+    return enviar_lectura(url_api, construir_cuerpo(captura['loteId'], rgb, es_muestra))
 
 
 def abrir_puerto(puerto):
