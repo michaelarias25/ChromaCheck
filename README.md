@@ -42,6 +42,24 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 | `npm run lint`            | Revisión con ESLint                                                     |
 | `npm run formato`         | Aplica el formato de Prettier                                           |
 | `npm run formato:revisar` | Revisa el formato sin cambiar archivos (lo exige la Definition of Done) |
+| `npm test`                | Ejecuta las pruebas unitarias con Jest                                  |
+| `npm run test:cobertura`  | Ejecuta las pruebas y mide la cobertura de `lib/modulos`                |
+
+### Pruebas
+
+Las pruebas unitarias están junto al código que prueban (`lib/modulos/<modulo>/*.test.ts`) y no necesitan la base de datos ni el servidor:
+
+- `reglas.test.ts`: funciones puras, incluidos los casos documentados CP-01 a CP-05 (deltaE CIE76, umbral 0,8 y alertas).
+- `servicio.test.ts`: la orquestación, con el repositorio simulado (`jest.mock`): modos de captura, pausa por alerta roja y errores.
+- `repositorio.test.ts`: las consultas SQL y sus parámetros, con el pool de PostgreSQL simulado.
+
+```bash
+npm test                      # todas las pruebas
+npm test -- lib/modulos/tarros   # solo las de un módulo
+npm run test:cobertura        # pruebas y cobertura
+```
+
+`npm run test:cobertura` muestra la tabla de cobertura en la terminal y genera el reporte en `coverage/index.html` (ábrelo en el navegador para ver línea por línea qué falta probar; la carpeta `coverage/` no se sube al repositorio). Falla si la cobertura de `lib/modulos` baja del 80 % (ACQ-03).
 
 ### Crear un usuario
 
