@@ -44,3 +44,6 @@ next-env.d.ts
 # python
 __pycache__/
 .venv/
+
+# platformio (compilación del firmware)
+firmware/.pio/
