@@ -10,10 +10,8 @@ const eslintConfig = defineConfig([
   prettier,
   {
     rules: {
-      // ACQ-03: complejidad ciclomática máxima de 10 por función. Queda como advertencia
-      // hasta refactorizar POST de app/api/tarros/route.ts (15) y PaginaLote de
-      // app/lotes/[id]/page.tsx (14); después pasará a 'error'
-      complexity: ['warn', 10],
+      // ACQ-03: complejidad ciclomática máxima de 10 por función
+      complexity: ['error', 10],
     },
   },
   // Override default ignores of eslint-config-next.
