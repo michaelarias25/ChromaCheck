@@ -1,6 +1,6 @@
-import pool from '@/lib/db';
+import pool, { ejecutarEnTransaccion, type EjecutorConsultas } from '@/lib/db';
 import { crearAlerta } from '@/lib/modulos/alertas/servicio';
-import { pausarLote } from '@/lib/modulos/lotes/servicio';
+import { finalizarModoMuestra, pausarLote } from '@/lib/modulos/lotes/servicio';
 
 // Trae todos los tarros de un lote específico
 export async function obtenerTarrosDeLote(loteId: number) {
@@ -116,20 +116,32 @@ export function excedeToleranciaDeltaE(desviacionDeltaE: number, limite = 0.8): 
   return desviacionDeltaE > limite;
 }
 
-// Registra un tarro nuevo (muestra o lectura normal) en un lote
+// Registra un tarro nuevo (muestra o lectura normal) en un lote.
+// Recibe el cliente de una transacción cuando forma parte de una operación mayor
 export async function registrarTarro(
   loteId: number,
   resultadoHex: string,
   desviacionDeltaE: number | null,
   resultado: string,
-  esMuestra: boolean
+  esMuestra: boolean,
+  ejecutor: EjecutorConsultas = pool
 ) {
-  const respuesta = await pool.query(
+  const respuesta = await ejecutor.query(
     `INSERT INTO tarros (lote_id, resultado_hex, desviacion_delta_e, resultado, es_muestra)
      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
     [loteId, resultadoHex, desviacionDeltaE, resultado, esMuestra]
   );
   return respuesta.rows[0];
+}
+
+// Registra el tarro muestra y deja el lote en modo 'Inactivo', en una sola transacción.
+// Devuelve null si el lote no está en modo 'Muestra' (por ejemplo, otra petición ya registró la muestra)
+export async function registrarMuestraDeLote(loteId: number, resultadoHex: string) {
+  return ejecutarEnTransaccion(async (cliente) => {
+    const estabaEnModoMuestra = await finalizarModoMuestra(cliente, loteId);
+    if (!estabaEnModoMuestra) return null;
+    return registrarTarro(loteId, resultadoHex, null, 'Muestra', true, cliente);
+  });
 }
 
 // Revisa si los últimos tarros del lote muestran una desviación en aumento sostenido

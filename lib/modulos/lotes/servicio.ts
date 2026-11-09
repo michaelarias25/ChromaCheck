@@ -1,6 +1,8 @@
+import type { PoolClient } from 'pg';
 import pool from '@/lib/db';
 import {
   actualizarModoCaptura,
+  detenerCapturaDeMuestra,
   buscarLoteCapturando,
   buscarLoteConMuestra,
   insertarLote,
@@ -75,6 +77,12 @@ export async function cambiarModoCaptura(
     };
   }
   return { tipo: 'cambiado', lote: loteActualizado };
+}
+
+// Saca el lote del modo 'Muestra' dentro de la transacción que registra la muestra.
+// Devuelve false si el lote ya no estaba en modo 'Muestra'
+export async function finalizarModoMuestra(cliente: PoolClient, loteId: number) {
+  return detenerCapturaDeMuestra(cliente, loteId);
 }
 
 // Pausa el lote por una alerta roja y detiene su captura en la misma operación

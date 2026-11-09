@@ -1,9 +1,10 @@
+import { puedeRegistrarLectura, puedeRegistrarMuestra } from '@/lib/modulos/lotes/reglas';
 import { obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
 import {
   obtenerMuestraDeLote,
   obtenerTarrosDeLote,
   registrarLecturaTarro,
-  registrarTarro,
+  registrarMuestraDeLote,
 } from '@/lib/modulos/tarros/servicio';
 import {
   leerCuerpoJson,
@@ -62,7 +63,15 @@ export async function POST(peticion: Request) {
       if (muestra) {
         return responderError('El lote ya tiene un tarro muestra registrado', 409);
       }
-      const tarroMuestra = await registrarTarro(loteId, resultadoHex, null, 'Muestra', true);
+      const mensajeSinModoMuestra = `El lote no está en modo Muestra (modo actual: ${lote.modo_captura}); actívalo desde la web antes de registrar la muestra`;
+      if (!puedeRegistrarMuestra(lote.modo_captura)) {
+        return responderError(mensajeSinModoMuestra, 409);
+      }
+      // Registra la muestra y deja el lote en modo Inactivo en la misma transacción
+      const tarroMuestra = await registrarMuestraDeLote(loteId, resultadoHex);
+      if (!tarroMuestra) {
+        return responderError(mensajeSinModoMuestra, 409);
+      }
       return responderExito(tarroMuestra, 201);
     }
 
@@ -78,6 +87,12 @@ export async function POST(peticion: Request) {
     // Una alerta roja pausa el lote: no se aceptan lecturas hasta revisar la línea
     if (lote.estado === 'Pausado') {
       return responderError('El lote está pausado por una alerta roja y no acepta lecturas', 409);
+    }
+    if (!puedeRegistrarLectura(lote.modo_captura)) {
+      return responderError(
+        `El lote no está en modo Recoleccion (modo actual: ${lote.modo_captura}); actívalo desde la web antes de enviar lecturas`,
+        409
+      );
     }
 
     const tarroNuevo = await registrarLecturaTarro(loteId, resultadoHex, rgb);
