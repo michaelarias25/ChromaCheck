@@ -37,11 +37,24 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 
 | Ruta | Pantalla |
 | --- | --- |
-| `/` | Lotes en producción, con su color muestra y desviación promedio. El botón **Agregar lote** crea un lote nuevo con su código |
-| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro, últimas 8 lecturas y alertas del lote (de la más reciente a la más antigua). Si el lote está pausado, muestra un aviso con el motivo |
+| `/` | Lotes en producción, con su color muestra y desviación promedio. El botón **Agregar lote** crea un lote nuevo con su código. La tarjeta indica en texto si el lote está **Esperando muestra** o **Recolectando lecturas** |
+| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro, últimas 8 lecturas y alertas del lote (de la más reciente a la más antigua). Si el lote está pausado, muestra un aviso con el motivo. La sección **Captura del sensor** controla el sensor (ver abajo) |
 | `/historial` | Historial de calidad de todos los tarros, 6 por página (`?pagina=N`) |
 
 En ambas pantallas el ΔE se muestra con 2 decimales (`—` si no está calculado) y el resultado de cada tarro con texto y símbolo: **Aprobado**, **No aprobado** o **Sin calcular**.
+
+### Captura del sensor
+
+En `/lotes/[id]`, un lote `Activo` decide qué hace el único sensor:
+
+| Situación | Qué se ve |
+| --- | --- |
+| Sin muestra | Botón **Registrar muestra**. Mientras espera muestra "Coloca el tarro muestra frente al sensor" y el botón **Cancelar**. Cuando llega la muestra, aparece su color en **Muestra Patrón** |
+| Con muestra | Botón **Iniciar recolección**, que cambia a **Detener recolección**, con el estado en texto: **Recolectando lecturas** o **Detenido** |
+| Otro lote capturando | El código de ese lote con enlace a su página; no se puede iniciar |
+| Lote `Pausado` | Sin botones de captura; solo el aviso con el motivo |
+
+Mientras el lote espera la muestra o recolecta, la página se refresca cada 3 segundos para mostrar la muestra, las lecturas y las alertas nuevas. Si la API rechaza un cambio, el mensaje aparece en texto.
 
 Los lotes se crean desde la pantalla principal; no se renombran. La API se documenta en [docs/api.md](docs/api.md). `POST /api/lotes` exige sesión iniciada; las demás rutas de la API quedan abiertas para el puente serial.
 
