@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "formato": "prettier --write .",
+    "formato:revisar": "prettier --check ."
   },
   "dependencies": {
     "next": "16.4.2",
