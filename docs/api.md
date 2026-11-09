@@ -89,7 +89,7 @@ Indica qué lote está capturando. Está abierta (sin sesión) porque la consult
 
 ### Contrato con el puente serial
 
-El puente todavía no consulta este endpoint (lo hará en otra tarea). Por cada `LECTURA;R;G;B` que reciba del Arduino deberá:
+El puente lo sigue cuando se ejecuta con `--automatico` (ver `puente-serial/README.md`). Por cada `LECTURA;R;G;B` que recibe del Arduino:
 
 1. Consultar `GET /api/captura/activa`.
 2. Si `datos` es `null`, descartar la lectura sin enviarla.
