@@ -7,23 +7,24 @@ interface PropiedadesInsigniaResultado {
 
 type TipoResultado = 'aprobado' | 'noAprobado' | 'sinCalcular';
 
-const ESTILOS_RESULTADO: Record<TipoResultado, { texto: string; simbolo: string; clases: string }> = {
-  aprobado: {
-    texto: 'Aprobado',
-    simbolo: '✓',
-    clases: 'bg-secondary-container text-secondary-fixed',
-  },
-  noAprobado: {
-    texto: 'No aprobado',
-    simbolo: '✕',
-    clases: 'bg-primary-container text-on-primary-container',
-  },
-  sinCalcular: {
-    texto: 'Sin calcular',
-    simbolo: '–',
-    clases: 'bg-surface-container-highest text-on-surface-variant',
-  },
-};
+const ESTILOS_RESULTADO: Record<TipoResultado, { texto: string; simbolo: string; clases: string }> =
+  {
+    aprobado: {
+      texto: 'Aprobado',
+      simbolo: '✓',
+      clases: 'bg-secondary-container text-secondary-fixed',
+    },
+    noAprobado: {
+      texto: 'No aprobado',
+      simbolo: '✕',
+      clases: 'bg-primary-container text-on-primary-container',
+    },
+    sinCalcular: {
+      texto: 'Sin calcular',
+      simbolo: '–',
+      clases: 'bg-surface-container-highest text-on-surface-variant',
+    },
+  };
 
 // Traduce el resultado guardado en la base ("Aprobado" / "No Aprobado") al tipo de insignia.
 // Sin deltaE no hay dictamen, aunque la columna resultado tenga texto
@@ -38,7 +39,10 @@ function obtenerTipoResultado(
   return 'sinCalcular';
 }
 
-export default function InsigniaResultado({ resultado, desviacionDeltaE }: PropiedadesInsigniaResultado) {
+export default function InsigniaResultado({
+  resultado,
+  desviacionDeltaE,
+}: PropiedadesInsigniaResultado) {
   const estilo = ESTILOS_RESULTADO[obtenerTipoResultado(resultado, desviacionDeltaE)];
 
   return (

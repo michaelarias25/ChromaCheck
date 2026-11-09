@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-surface: #101418;
@@ -21,8 +21,8 @@
   --color-on-tertiary-container: #503d00;
   --color-outline: #a48b89;
 
-  --font-headline: var(--font-montserrat), "Montserrat", sans-serif;
-  --font-body: var(--font-inter), "Inter", sans-serif;
+  --font-headline: var(--font-montserrat), 'Montserrat', sans-serif;
+  --font-body: var(--font-inter), 'Inter', sans-serif;
 }
 
 body {

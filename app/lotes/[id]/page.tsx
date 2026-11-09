@@ -70,7 +70,9 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
         {/* Comparativa muestra vs último tarro */}
         <div className="grid grid-cols-2 gap-4 bg-surface-container rounded-lg overflow-hidden">
           <div>
-            <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">Muestra Patrón</div>
+            <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">
+              Muestra Patrón
+            </div>
             <div
               className="h-40 flex items-end p-3"
               style={{ backgroundColor: muestra?.resultado_hex || '#555' }}
@@ -81,7 +83,9 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
             </div>
           </div>
           <div>
-            <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">Último Tarro Leído</div>
+            <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">
+              Último Tarro Leído
+            </div>
             <div
               className="h-40 flex items-end justify-between p-3"
               style={{ backgroundColor: ultimoTarro?.resultado_hex || '#555' }}
@@ -174,7 +178,10 @@ function AvisoLotePausado({ alertaQuePauso }: { alertaQuePauso: AlertaLote | und
 
 const ESTILOS_NIVEL_ALERTA: Record<AlertaLote['nivel'], { texto: string; clases: string }> = {
   Roja: { texto: 'Alerta roja', clases: 'bg-primary-container text-on-primary-container' },
-  Amarilla: { texto: 'Alerta amarilla', clases: 'bg-tertiary-container text-on-tertiary-container' },
+  Amarilla: {
+    texto: 'Alerta amarilla',
+    clases: 'bg-tertiary-container text-on-tertiary-container',
+  },
 };
 
 // Lista de alertas del lote, de la más reciente a la más antigua

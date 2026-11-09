@@ -34,12 +34,12 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 
 ## Comandos
 
-| Comando | Uso |
-| --- | --- |
-| `npm run dev` | Servidor de desarrollo en <http://localhost:3000> |
-| `npm run build` | Compilación de producción |
-| `npm run start` | Servidor de producción (después de `build`) |
-| `npm run lint` | Revisión con ESLint |
+| Comando         | Uso                                               |
+| --------------- | ------------------------------------------------- |
+| `npm run dev`   | Servidor de desarrollo en <http://localhost:3000> |
+| `npm run build` | Compilación de producción                         |
+| `npm run start` | Servidor de producción (después de `build`)       |
+| `npm run lint`  | Revisión con ESLint                               |
 
 ### Crear un usuario
 
@@ -53,11 +53,11 @@ Requiere **Node 22.6 o superior**: es la primera versión con `--experimental-st
 
 ## Rutas
 
-| Ruta | Pantalla |
-| --- | --- |
-| `/` | Lotes en producción, con su color muestra y desviación promedio. El botón **Agregar lote** crea un lote nuevo con su código. La tarjeta indica en texto si el lote está **Esperando muestra** o **Recolectando lecturas** |
+| Ruta          | Pantalla                                                                                                                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`           | Lotes en producción, con su color muestra y desviación promedio. El botón **Agregar lote** crea un lote nuevo con su código. La tarjeta indica en texto si el lote está **Esperando muestra** o **Recolectando lecturas**                                  |
 | `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro, últimas 8 lecturas y alertas del lote (de la más reciente a la más antigua). Si el lote está pausado, muestra un aviso con el motivo. La sección **Captura del sensor** controla el sensor (ver abajo) |
-| `/historial` | Historial de calidad de todos los tarros, 6 por página (`?pagina=N`) |
+| `/historial`  | Historial de calidad de todos los tarros, 6 por página (`?pagina=N`)                                                                                                                                                                                       |
 
 En ambas pantallas el ΔE se muestra con 2 decimales (`—` si no está calculado) y el resultado de cada tarro con texto y símbolo: **Aprobado**, **No aprobado** o **Sin calcular**.
 
@@ -65,12 +65,12 @@ En ambas pantallas el ΔE se muestra con 2 decimales (`—` si no está calculad
 
 En `/lotes/[id]`, un lote `Activo` decide qué hace el único sensor:
 
-| Situación | Qué se ve |
-| --- | --- |
-| Sin muestra | Botón **Registrar muestra**. Mientras espera muestra "Coloca el tarro muestra frente al sensor" y el botón **Cancelar**. Cuando llega la muestra, aparece su color en **Muestra Patrón** |
-| Con muestra | Botón **Iniciar recolección**, que cambia a **Detener recolección**, con el estado en texto: **Recolectando lecturas** o **Detenido** |
-| Otro lote capturando | El código de ese lote con enlace a su página; no se puede iniciar |
-| Lote `Pausado` | Sin botones de captura; solo el aviso con el motivo |
+| Situación            | Qué se ve                                                                                                                                                                                |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sin muestra          | Botón **Registrar muestra**. Mientras espera muestra "Coloca el tarro muestra frente al sensor" y el botón **Cancelar**. Cuando llega la muestra, aparece su color en **Muestra Patrón** |
+| Con muestra          | Botón **Iniciar recolección**, que cambia a **Detener recolección**, con el estado en texto: **Recolectando lecturas** o **Detenido**                                                    |
+| Otro lote capturando | El código de ese lote con enlace a su página; no se puede iniciar                                                                                                                        |
+| Lote `Pausado`       | Sin botones de captura; solo el aviso con el motivo                                                                                                                                      |
 
 Mientras el lote espera la muestra o recolecta, la página se refresca cada 3 segundos para mostrar la muestra, las lecturas y las alertas nuevas. Si la API rechaza un cambio, el mensaje aparece en texto.
 
@@ -89,12 +89,12 @@ public/               Logo e imágenes
 
 ## Base de datos
 
-| Tabla | Columnas |
-| --- | --- |
-| `lotes` | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `modo_captura` (`Inactivo` por defecto, `Muestra` o `Recoleccion`; ver [docs/api.md](docs/api.md)), `fecha_inicio` |
-| `tarros` | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp` |
-| `alertas` | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp` |
-| `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion` |
+| Tabla      | Columnas                                                                                                                                                                                                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lotes`    | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `modo_captura` (`Inactivo` por defecto, `Muestra` o `Recoleccion`; ver [docs/api.md](docs/api.md)), `fecha_inicio` |
+| `tarros`   | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp`                                                                                                                                 |
+| `alertas`  | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp`                                                                                                                                                                           |
+| `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion`                                                                                                                                                                                                                      |
 
 El código único de `lotes` se garantiza con este índice (probado primero en el SQL Editor de Neon):
 

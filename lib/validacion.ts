@@ -22,7 +22,10 @@ export function esColorRgbValido(valor: unknown): valor is [number, number, numb
 }
 
 // Indica si el color hex y el color RGB representan el mismo color
-export function coincidenColorHexYRgb(colorHex: string, colorRgb: [number, number, number]): boolean {
+export function coincidenColorHexYRgb(
+  colorHex: string,
+  colorRgb: [number, number, number]
+): boolean {
   const colorHexDesdeRgb =
     '#' + colorRgb.map((canal) => canal.toString(16).padStart(2, '0')).join('');
   return colorHexDesdeRgb.toLowerCase() === colorHex.toLowerCase();

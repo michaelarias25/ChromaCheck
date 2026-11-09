@@ -11,7 +11,10 @@ import {
 import { esEnteroPositivo } from '@/lib/validacion';
 
 // Cambia el modo de captura de un lote. Solo lo usa la web, así que exige sesión
-export async function PATCH(peticion: NextRequest, contexto: RouteContext<'/api/lotes/[id]/captura'>) {
+export async function PATCH(
+  peticion: NextRequest,
+  contexto: RouteContext<'/api/lotes/[id]/captura'>
+) {
   try {
     const idUsuario = await obtenerIdUsuarioDePeticion(peticion);
     if (!idUsuario) {

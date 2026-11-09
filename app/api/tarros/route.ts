@@ -76,7 +76,10 @@ export async function POST(peticion: Request) {
     }
 
     if (!esColorRgbValido(rgb)) {
-      return responderError('El campo "rgb" debe ser un arreglo [r, g, b] de enteros entre 0 y 255', 400);
+      return responderError(
+        'El campo "rgb" debe ser un arreglo [r, g, b] de enteros entre 0 y 255',
+        400
+      );
     }
     if (!coincidenColorHexYRgb(resultadoHex, rgb)) {
       return responderError('Los campos "resultadoHex" y "rgb" no representan el mismo color', 400);

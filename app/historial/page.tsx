@@ -17,7 +17,9 @@ interface FilaHistorialTarro {
 
 // Convierte el parámetro ?pagina= en un número de página válido (1 si viene vacío o mal escrito)
 function leerNumeroPagina(parametroPagina: string | string[] | undefined): number {
-  const numeroPagina = Number(Array.isArray(parametroPagina) ? parametroPagina[0] : parametroPagina);
+  const numeroPagina = Number(
+    Array.isArray(parametroPagina) ? parametroPagina[0] : parametroPagina
+  );
   return Number.isInteger(numeroPagina) && numeroPagina >= 1 ? numeroPagina : 1;
 }
 

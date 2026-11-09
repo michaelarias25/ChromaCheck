@@ -29,9 +29,7 @@ export interface CapturaActiva {
 
 // Trae todos los lotes, más recientes primero
 export async function obtenerLotes() {
-  const resultado = await pool.query(
-    'SELECT * FROM lotes ORDER BY fecha_inicio DESC'
-  );
+  const resultado = await pool.query('SELECT * FROM lotes ORDER BY fecha_inicio DESC');
   return resultado.rows;
 }
 

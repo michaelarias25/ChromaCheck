@@ -30,9 +30,7 @@ export default async function PaginaPrincipal() {
     <main className="min-h-screen bg-surface text-on-surface">
       <section className="max-w-7xl mx-auto px-6 py-10">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
-          <h1 className="font-headline text-3xl font-bold uppercase">
-            Lotes en Producción Actual
-          </h1>
+          <h1 className="font-headline text-3xl font-bold uppercase">Lotes en Producción Actual</h1>
           <FormularioAgregarLote />
         </div>
 
@@ -94,7 +92,9 @@ function TarjetaLote({ lote }: { lote: LoteConResumen }) {
 
         <div className="bg-surface-container-low p-4 rounded flex items-center justify-between">
           <div>
-            <span className="text-xs uppercase text-on-surface-variant block">Desviación Promedio</span>
+            <span className="text-xs uppercase text-on-surface-variant block">
+              Desviación Promedio
+            </span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-4xl font-bold">{desviacion}</span>
               <span className="text-sm text-on-surface-variant">ΔE</span>
