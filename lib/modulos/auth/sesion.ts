@@ -1,4 +1,6 @@
 // Sesión basada en una cookie firmada con HMAC-SHA256 (Web Crypto, funciona en rutas y en proxy)
+import type { NextRequest } from 'next/server';
+
 export const NOMBRE_COOKIE_SESION = 'sesion';
 export const DURACION_SESION_SEGUNDOS = 60 * 60 * 8;
 
@@ -64,4 +66,10 @@ export async function verificarTokenSesion(token: string | undefined): Promise<n
   if (haExpirado || !Number.isInteger(idUsuario)) return null;
 
   return idUsuario;
+}
+
+// Devuelve el id del usuario si la petición trae una cookie de sesión válida, o null.
+// Lo usan los endpoints de escritura que solo usa la web
+export async function obtenerIdUsuarioDePeticion(peticion: NextRequest): Promise<number | null> {
+  return verificarTokenSesion(peticion.cookies.get(NOMBRE_COOKIE_SESION)?.value);
 }
