@@ -1,6 +1,6 @@
 import pool from '@/lib/db';
 import { crearAlerta } from '@/lib/modulos/alertas/servicio';
-import { actualizarEstadoLote } from '@/lib/modulos/lotes/servicio';
+import { pausarLote } from '@/lib/modulos/lotes/servicio';
 
 // Trae todos los tarros de un lote específico
 export async function obtenerTarrosDeLote(loteId: number) {
@@ -189,7 +189,8 @@ export async function registrarLecturaTarro(
         'Desviación acumulativa detectada: revisar mezclador o posibles fugas',
         true
       );
-      await actualizarEstadoLote(loteId, 'Pausado');
+      // Pausar también detiene la captura: el lote deja de recibir lecturas del sensor
+      await pausarLote(loteId);
     } else {
       await crearAlerta(
         tarroNuevo.id_tarro,

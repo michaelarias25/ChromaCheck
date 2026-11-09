@@ -4,6 +4,7 @@ import {
   buscarLoteCapturando,
   buscarLoteConMuestra,
   insertarLote,
+  pausarLoteYDetenerCaptura,
   type Lote,
 } from './repositorio';
 import {
@@ -74,6 +75,11 @@ export async function cambiarModoCaptura(
     };
   }
   return { tipo: 'cambiado', lote: loteActualizado };
+}
+
+// Pausa el lote por una alerta roja y detiene su captura en la misma operación
+export async function pausarLote(loteId: number) {
+  return pausarLoteYDetenerCaptura(loteId);
 }
 
 // Indica qué lote está capturando y en qué modo, para el puente serial; null si ninguno
