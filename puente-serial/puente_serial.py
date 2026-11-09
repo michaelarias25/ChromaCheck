@@ -25,6 +25,11 @@ VELOCIDAD_SERIAL = 9600  # contrato con firmware/chromacheck_sensor
 PREFIJO_AVISO = 'AVISO;'
 ESPERA_REINICIO_ARDUINO_SEGUNDOS = 2
 URL_API_POR_DEFECTO = 'http://localhost:3000'
+COMANDO_VER_CALIBRACION = b'CALIBRAR;VER\n'
+PREFIJO_ESTADO_CALIBRACION = 'CALIBRACION;ESTADO;'
+ESTADO_CALIBRACION_VALIDA = 'VALIDA'
+ESTADO_SIN_CALIBRAR = 'SIN_CALIBRAR'
+TIEMPO_ESPERA_CALIBRACION_SEGUNDOS = 3
 
 
 def interpretar_linea(linea):
@@ -126,16 +131,64 @@ def abrir_puerto(puerto):
     return conexion
 
 
+def leer_linea(conexion):
+    """Lee una línea del puerto como texto ('' si se agotó la espera sin datos)."""
+    return conexion.readline().decode('utf-8', errors='replace')
+
+
+def consultar_estado_calibracion(conexion, tiempo_espera=TIEMPO_ESPERA_CALIBRACION_SEGUNDOS):
+    """Envía "CALIBRAR;VER" y devuelve el estado que responde el Arduino.
+
+    Devuelve 'VALIDA', 'SIN_CALIBRAR' (u otro estado que informe el firmware), o
+    None si no llega la respuesta a tiempo. Las demás líneas que lleguen mientras
+    tanto se descartan; el firmware reinicia la lectura en curso al recibir el comando.
+    """
+    conexion.write(COMANDO_VER_CALIBRACION)
+    conexion.flush()
+    limite = time.monotonic() + tiempo_espera
+    while time.monotonic() < limite:
+        linea = leer_linea(conexion).strip()
+        if linea.startswith(PREFIJO_ESTADO_CALIBRACION):
+            return linea[len(PREFIJO_ESTADO_CALIBRACION):]
+        if linea.startswith(PREFIJO_LECTURA):
+            logging.warning('Lectura descartada mientras se verificaba la calibración: %s', linea)
+    return None
+
+
+def verificar_calibracion(conexion, tiempo_espera=TIEMPO_ESPERA_CALIBRACION_SEGUNDOS):
+    """Consulta la calibración del Arduino al abrir el puerto y avisa si falta.
+
+    El aviso del arranque (AVISO;SIN_CALIBRAR) se pierde al limpiar el búfer de
+    entrada, y sin calibración el firmware no envía lecturas: sin este aviso el
+    puente quedaría en silencio. Devuelve el estado, o None si no hubo respuesta.
+    """
+    estado = consultar_estado_calibracion(conexion, tiempo_espera)
+    if estado == ESTADO_CALIBRACION_VALIDA:
+        logging.info('Calibración del sensor: válida')
+    elif estado == ESTADO_SIN_CALIBRAR:
+        logging.warning(
+            'EL SENSOR NO ESTÁ CALIBRADO: el Arduino no enviará lecturas. Calíbralo con los '
+            'comandos CALIBRAR;BLANCO, CALIBRAR;NEGRO, CALIBRAR;VACIO y CALIBRAR;GUARDAR '
+            '(ver firmware/chromacheck_sensor) y vuelve a iniciar el puente.')
+    elif estado is None:
+        logging.warning('El Arduino no respondió a CALIBRAR;VER: revisa el puerto y que tenga '
+                        'cargado el firmware de ChromaCheck.')
+    else:
+        logging.warning('Estado de calibración desconocido: %s', estado)
+    return estado
+
+
 def ejecutar_puente(puerto, lote_id, url_api, es_muestra=False):
     """Lee el puerto y reenvía cada lectura a la API hasta que se interrumpa.
 
     Con es_muestra termina tras la primera lectura y devuelve si quedó registrada.
     """
     with abrir_puerto(puerto) as conexion:
+        verificar_calibracion(conexion)
         logging.info('Escuchando %s a %s baudios; lote %s; API %s',
                      puerto, VELOCIDAD_SERIAL, lote_id, url_api)
         while True:
-            linea = conexion.readline().decode('utf-8', errors='replace')
+            linea = leer_linea(conexion)
             registrada = procesar_linea(linea, lote_id, url_api, es_muestra)
             if es_muestra and registrada is not None:
                 return registrada
