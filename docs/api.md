@@ -21,16 +21,22 @@ Lista todos los lotes, del más reciente al más antiguo.
 
 ### `POST /api/lotes`
 
-Crea un lote.
+Crea un lote. La usa solo la web (botón **Agregar lote** de la pantalla principal), por eso exige la cookie `sesion` de un usuario con sesión iniciada (ver `docs/autenticacion.md`). El puente serial no la llama.
 
 ```json
 { "codigo": "#005_Azul_Cielo" }
 ```
 
+| Campo | Regla |
+| --- | --- |
+| `codigo` | Texto obligatorio, de 1 a 50 caracteres sin contar los espacios de los extremos (se recortan). Único: `#005_azul` y `#005_Azul` cuentan como el mismo código |
+
 | Código | Caso |
 | --- | --- |
 | 201 | Lote creado |
-| 400 | El cuerpo no es un objeto JSON o falta `codigo` |
+| 400 | El cuerpo no es un objeto JSON, falta `codigo` o tiene más de 50 caracteres |
+| 401 | No hay sesión válida |
+| 409 | Ya existe un lote con ese código |
 
 ## Tarros
 

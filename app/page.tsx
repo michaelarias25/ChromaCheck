@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { connection } from 'next/server';
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
+import FormularioAgregarLote from './componentes/FormularioAgregarLote';
 
 interface LoteConResumen {
   id: number;
@@ -19,9 +20,12 @@ export default async function PaginaPrincipal() {
   return (
     <main className="min-h-screen bg-surface text-on-surface">
       <section className="max-w-7xl mx-auto px-6 py-10">
-        <h1 className="font-headline text-3xl font-bold uppercase mb-8">
-          Lotes en Producción Actual
-        </h1>
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
+          <h1 className="font-headline text-3xl font-bold uppercase">
+            Lotes en Producción Actual
+          </h1>
+          <FormularioAgregarLote />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {lotes.map((lote: LoteConResumen) => (

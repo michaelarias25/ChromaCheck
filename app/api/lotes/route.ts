@@ -1,3 +1,5 @@
+import type { NextRequest } from 'next/server';
+import { NOMBRE_COOKIE_SESION, verificarTokenSesion } from '@/lib/modulos/auth/sesion';
 import { obtenerLotes, crearLote } from '@/lib/modulos/lotes/servicio';
 import {
   leerCuerpoJson,
@@ -5,6 +7,7 @@ import {
   responderErrorInterno,
   responderExito,
 } from '@/lib/respuestas';
+import { excedeLongitudCodigoLote, LONGITUD_MAXIMA_CODIGO_LOTE } from '@/lib/validacion';
 
 export async function GET() {
   try {
@@ -15,8 +18,14 @@ export async function GET() {
   }
 }
 
-export async function POST(peticion: Request) {
+// Solo la web crea lotes (el puente serial no usa esta ruta), así que exige sesión
+export async function POST(peticion: NextRequest) {
   try {
+    const idUsuario = await verificarTokenSesion(peticion.cookies.get(NOMBRE_COOKIE_SESION)?.value);
+    if (!idUsuario) {
+      return responderError('Inicia sesión para crear un lote', 401);
+    }
+
     const cuerpo = await leerCuerpoJson(peticion);
     if (!cuerpo) {
       return responderError('El cuerpo de la petición debe ser un objeto JSON', 400);
@@ -26,8 +35,17 @@ export async function POST(peticion: Request) {
     if (!codigo) {
       return responderError('El campo "codigo" es obligatorio', 400);
     }
+    if (excedeLongitudCodigoLote(codigo)) {
+      return responderError(
+        `El campo "codigo" no puede tener más de ${LONGITUD_MAXIMA_CODIGO_LOTE} caracteres`,
+        400
+      );
+    }
 
     const loteNuevo = await crearLote(codigo);
+    if (!loteNuevo) {
+      return responderError(`Ya existe un lote con el código "${codigo}"`, 409);
+    }
     return responderExito(loteNuevo, 201);
   } catch (error) {
     return responderErrorInterno(error);

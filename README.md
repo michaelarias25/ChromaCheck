@@ -37,13 +37,11 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 
 | Ruta | Pantalla |
 | --- | --- |
-| `/` | Lotes en producción, con su color muestra y desviación promedio |
-| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro, últimas 8 lecturas y alertas del lote (de la más reciente a la más antigua). Si el lote está pausado, muestra un aviso con el motivo |
+| `/` | Lotes en producción, con su color muestra y desviación promedio. El botón **Agregar lote** crea un lote nuevo con su código |
+| `/lotes/[id]` | Monitoreo de un lote: muestra patrón, último tarro y últimas 8 lecturas |
 | `/historial` | Historial de calidad de todos los tarros, 6 por página (`?pagina=N`) |
 
-En ambas pantallas el ΔE se muestra con 2 decimales (`—` si no está calculado) y el resultado de cada tarro con texto y símbolo: **Aprobado**, **No aprobado** o **Sin calcular**.
-
-La API se documenta en [docs/api.md](docs/api.md).
+Los lotes se crean desde la pantalla principal; no se renombran. La API se documenta en [docs/api.md](docs/api.md). `POST /api/lotes` exige sesión iniciada; las demás rutas de la API quedan abiertas para el puente serial.
 
 ## Estructura
 
@@ -60,10 +58,16 @@ public/               Logo e imágenes
 
 | Tabla | Columnas |
 | --- | --- |
-| `lotes` | `id`, `codigo`, `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `fecha_inicio` |
+| `lotes` | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `fecha_inicio` |
 | `tarros` | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp` |
 | `alertas` | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp` |
 | `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion` |
+
+El código único de `lotes` se garantiza con este índice (probado primero en el SQL Editor de Neon):
+
+```sql
+CREATE UNIQUE INDEX lotes_codigo_unico ON lotes (LOWER(TRIM(codigo)));
+```
 
 ## Integrantes
 
