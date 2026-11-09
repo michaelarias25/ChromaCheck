@@ -1,5 +1,6 @@
-// Reglas de calidad de los tarros: cálculo de deltaE (CIE76), dictamen y alertas.
-// Funciones puras, sin acceso a la base de datos
+// Reglas de calidad de los tarros: cálculo de deltaE (CIE76), dictamen, alertas y cuándo
+// se acepta registrar un tarro. Funciones puras, sin acceso a la base de datos
+import { puedeRegistrarLectura, puedeRegistrarMuestra } from '@/lib/modulos/lotes/reglas';
 
 export type ColorRgb = [number, number, number];
 
@@ -11,6 +12,13 @@ export interface AlertaCalculada {
   nivel: NivelAlerta;
   mensaje: string;
   congelaRegistro: boolean;
+}
+
+// Lo que hace falta saber del lote para decidir si acepta un tarro
+export interface LoteParaRegistro {
+  estado: string;
+  modoCaptura: string;
+  tieneMuestra: boolean;
 }
 
 // ACQ-04: una lectura con deltaE mayor que este valor no se aprueba
@@ -120,4 +128,35 @@ export function construirAlerta(nivel: NivelAlerta, desviacionDeltaE: number): A
     mensaje: `Desviación aislada de ${desviacionDeltaE} ΔE`,
     congelaRegistro: false,
   };
+}
+
+// Revisa si el lote acepta su tarro muestra. Devuelve el motivo del rechazo, o null si lo acepta
+export function obtenerMotivoRechazoMuestra(lote: LoteParaRegistro): string | null {
+  if (lote.tieneMuestra) {
+    return 'El lote ya tiene un tarro muestra registrado';
+  }
+  if (!puedeRegistrarMuestra(lote.modoCaptura)) {
+    return crearMensajeSinModoMuestra(lote.modoCaptura);
+  }
+  return null;
+}
+
+// Mensaje cuando el lote no está en modo Muestra al llegar su tarro muestra
+export function crearMensajeSinModoMuestra(modoCaptura: string): string {
+  return `El lote no está en modo Muestra (modo actual: ${modoCaptura}); actívalo desde la web antes de registrar la muestra`;
+}
+
+// Revisa si el lote acepta una lectura. Devuelve el motivo del rechazo, o null si la acepta
+export function obtenerMotivoRechazoLectura(lote: LoteParaRegistro): string | null {
+  if (!lote.tieneMuestra) {
+    return 'El lote no tiene tarro muestra registrado';
+  }
+  // Una alerta roja pausa el lote: no se aceptan lecturas hasta revisar la línea
+  if (lote.estado === 'Pausado') {
+    return 'El lote está pausado por una alerta roja y no acepta lecturas';
+  }
+  if (!puedeRegistrarLectura(lote.modoCaptura)) {
+    return `El lote no está en modo Recoleccion (modo actual: ${lote.modoCaptura}); actívalo desde la web antes de enviar lecturas`;
+  }
+  return null;
 }

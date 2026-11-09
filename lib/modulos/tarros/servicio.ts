@@ -1,6 +1,6 @@
 import { ejecutarEnTransaccion } from '@/lib/db';
 import { crearAlerta } from '@/lib/modulos/alertas/servicio';
-import { finalizarModoMuestra, pausarLote } from '@/lib/modulos/lotes/servicio';
+import { finalizarModoMuestra, obtenerLotePorId, pausarLote } from '@/lib/modulos/lotes/servicio';
 import {
   buscarLecturasRecientesDeLote,
   buscarMuestraDeLote,
@@ -9,18 +9,27 @@ import {
   buscarUltimasDesviacionesDeLote,
   contarLecturas,
   insertarTarro,
+  type Tarro,
 } from './repositorio';
 import {
   calcularDesviacionDeltaE,
   construirAlerta,
   convertirHexARgb,
+  crearMensajeSinModoMuestra,
   formanPatronAcumulativo,
   LECTURAS_PATRON_ACUMULATIVO,
+  obtenerMotivoRechazoLectura,
+  obtenerMotivoRechazoMuestra,
   obtenerNivelAlerta,
   obtenerResultadoLectura,
   RESULTADO_MUESTRA,
   type ColorRgb,
 } from './reglas';
+
+export type ResultadoRegistroTarro =
+  | { tipo: 'loteInexistente' }
+  | { tipo: 'rechazado'; mensaje: string }
+  | { tipo: 'registrado'; tarro: Tarro };
 
 // Trae todos los tarros de un lote específico
 export async function obtenerTarrosDeLote(loteId: number) {
@@ -67,14 +76,75 @@ export async function registrarMuestraDeLote(loteId: number, resultadoHex: strin
   });
 }
 
-// Orquesta el registro completo de una lectura: calcula deltaE, decide resultado y genera alerta si aplica
-export async function registrarLecturaTarro(loteId: number, resultadoHex: string, rgb: ColorRgb) {
-  const muestra = await buscarMuestraDeLote(loteId);
-  if (!muestra) {
-    throw new Error('El lote no tiene tarro muestra registrado');
+// Trae el lote y su muestra para decidir si acepta un tarro; null si el lote no existe
+async function buscarLoteYMuestra(loteId: number) {
+  const [lote, muestra] = await Promise.all([
+    obtenerLotePorId(loteId),
+    buscarMuestraDeLote(loteId),
+  ]);
+  if (!lote) return null;
+  const loteParaRegistro = {
+    estado: lote.estado,
+    modoCaptura: lote.modo_captura,
+    tieneMuestra: Boolean(muestra),
+  };
+  return { loteParaRegistro, muestra };
+}
+
+// Registra el tarro muestra que envía el sensor (POST /api/tarros con esMuestra), si el lote
+// está en modo Muestra y aún no tiene muestra
+export async function registrarMuestraDelSensor(
+  loteId: number,
+  resultadoHex: string
+): Promise<ResultadoRegistroTarro> {
+  const datos = await buscarLoteYMuestra(loteId);
+  if (!datos) return { tipo: 'loteInexistente' };
+
+  const motivoRechazo = obtenerMotivoRechazoMuestra(datos.loteParaRegistro);
+  if (motivoRechazo) return { tipo: 'rechazado', mensaje: motivoRechazo };
+
+  // Registra la muestra y deja el lote en modo Inactivo en la misma transacción
+  const tarro = await registrarMuestraDeLote(loteId, resultadoHex);
+  if (!tarro) {
+    // Otra petición registró la muestra o cambió el modo entre la revisión y el registro
+    return {
+      tipo: 'rechazado',
+      mensaje: crearMensajeSinModoMuestra(datos.loteParaRegistro.modoCaptura),
+    };
+  }
+  return { tipo: 'registrado', tarro };
+}
+
+// Registra una lectura que envía el sensor, si el lote tiene muestra, está Activo y en modo
+// Recoleccion: calcula deltaE, decide el resultado y genera la alerta si aplica
+export async function registrarLecturaDelSensor(
+  loteId: number,
+  resultadoHex: string,
+  rgb: ColorRgb
+): Promise<ResultadoRegistroTarro> {
+  const datos = await buscarLoteYMuestra(loteId);
+  if (!datos) return { tipo: 'loteInexistente' };
+
+  const motivoRechazo = obtenerMotivoRechazoLectura(datos.loteParaRegistro);
+  if (motivoRechazo || !datos.muestra) {
+    return {
+      tipo: 'rechazado',
+      mensaje: motivoRechazo ?? 'El lote no tiene tarro muestra registrado',
+    };
   }
 
-  const desviacionDeltaE = calcularDesviacionDeltaE(convertirHexARgb(muestra.resultado_hex), rgb);
+  const tarro = await registrarLectura(loteId, resultadoHex, rgb, datos.muestra.resultado_hex);
+  return { tipo: 'registrado', tarro };
+}
+
+// Guarda la lectura con su deltaE y su dictamen, y registra la alerta si corresponde
+async function registrarLectura(
+  loteId: number,
+  resultadoHex: string,
+  rgb: ColorRgb,
+  muestraHex: string
+) {
+  const desviacionDeltaE = calcularDesviacionDeltaE(convertirHexARgb(muestraHex), rgb);
   const tarroNuevo = await insertarTarro({
     loteId,
     resultadoHex,

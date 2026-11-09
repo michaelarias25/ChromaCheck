@@ -1,10 +1,8 @@
-import { puedeRegistrarLectura, puedeRegistrarMuestra } from '@/lib/modulos/lotes/reglas';
-import { obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
 import {
-  obtenerMuestraDeLote,
   obtenerTarrosDeLote,
-  registrarLecturaTarro,
-  registrarMuestraDeLote,
+  registrarLecturaDelSensor,
+  registrarMuestraDelSensor,
+  type ResultadoRegistroTarro,
 } from '@/lib/modulos/tarros/servicio';
 import {
   leerCuerpoJson,
@@ -34,6 +32,8 @@ export async function GET(peticion: Request) {
   }
 }
 
+// Registra el tarro muestra de un lote o una lectura del sensor. Las reglas (modo de captura,
+// lote pausado, muestra única) las aplica el servicio; aquí solo se valida el formato
 export async function POST(peticion: Request) {
   try {
     const cuerpo = await leerCuerpoJson(peticion);
@@ -42,8 +42,6 @@ export async function POST(peticion: Request) {
     }
 
     const { loteId, resultadoHex, rgb } = cuerpo;
-    const esMuestra = cuerpo.esMuestra === true;
-
     if (!esEnteroPositivo(loteId)) {
       return responderError('El campo "loteId" debe ser un entero positivo', 400);
     }
@@ -51,28 +49,8 @@ export async function POST(peticion: Request) {
       return responderError('El campo "resultadoHex" debe tener el formato #RRGGBB', 400);
     }
 
-    const [lote, muestra] = await Promise.all([
-      obtenerLotePorId(loteId),
-      obtenerMuestraDeLote(loteId),
-    ]);
-    if (!lote) {
-      return responderError(`El lote ${loteId} no existe`, 404);
-    }
-
-    if (esMuestra) {
-      if (muestra) {
-        return responderError('El lote ya tiene un tarro muestra registrado', 409);
-      }
-      const mensajeSinModoMuestra = `El lote no está en modo Muestra (modo actual: ${lote.modo_captura}); actívalo desde la web antes de registrar la muestra`;
-      if (!puedeRegistrarMuestra(lote.modo_captura)) {
-        return responderError(mensajeSinModoMuestra, 409);
-      }
-      // Registra la muestra y deja el lote en modo Inactivo en la misma transacción
-      const tarroMuestra = await registrarMuestraDeLote(loteId, resultadoHex);
-      if (!tarroMuestra) {
-        return responderError(mensajeSinModoMuestra, 409);
-      }
-      return responderExito(tarroMuestra, 201);
+    if (cuerpo.esMuestra === true) {
+      return responderRegistro(await registrarMuestraDelSensor(loteId, resultadoHex), loteId);
     }
 
     if (!esColorRgbValido(rgb)) {
@@ -84,23 +62,20 @@ export async function POST(peticion: Request) {
     if (!coincidenColorHexYRgb(resultadoHex, rgb)) {
       return responderError('Los campos "resultadoHex" y "rgb" no representan el mismo color', 400);
     }
-    if (!muestra) {
-      return responderError('El lote no tiene tarro muestra registrado', 409);
-    }
-    // Una alerta roja pausa el lote: no se aceptan lecturas hasta revisar la línea
-    if (lote.estado === 'Pausado') {
-      return responderError('El lote está pausado por una alerta roja y no acepta lecturas', 409);
-    }
-    if (!puedeRegistrarLectura(lote.modo_captura)) {
-      return responderError(
-        `El lote no está en modo Recoleccion (modo actual: ${lote.modo_captura}); actívalo desde la web antes de enviar lecturas`,
-        409
-      );
-    }
 
-    const tarroNuevo = await registrarLecturaTarro(loteId, resultadoHex, rgb);
-    return responderExito(tarroNuevo, 201);
+    return responderRegistro(await registrarLecturaDelSensor(loteId, resultadoHex, rgb), loteId);
   } catch (error) {
     return responderErrorInterno(error);
   }
+}
+
+// Traduce el resultado del registro a la respuesta HTTP
+function responderRegistro(resultado: ResultadoRegistroTarro, loteId: number) {
+  if (resultado.tipo === 'loteInexistente') {
+    return responderError(`El lote ${loteId} no existe`, 404);
+  }
+  if (resultado.tipo === 'rechazado') {
+    return responderError(resultado.mensaje, 409);
+  }
+  return responderExito(resultado.tarro, 201);
 }
