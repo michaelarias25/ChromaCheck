@@ -2,52 +2,29 @@ import { notFound } from 'next/navigation';
 import ControlCaptura from '@/app/componentes/ControlCaptura';
 import InsigniaResultado from '@/app/componentes/InsigniaResultado';
 import { formatearDeltaE, formatearFechaHora } from '@/lib/formato';
+import type { Alerta } from '@/lib/modulos/alertas/repositorio';
 import { obtenerAlertasDeLote } from '@/lib/modulos/alertas/servicio';
 import { obtenerCapturaActiva, obtenerLotePorId } from '@/lib/modulos/lotes/servicio';
 import {
   obtenerLecturasRecientesDeLote,
   obtenerMuestraDeLote,
 } from '@/lib/modulos/tarros/servicio';
+import type { Tarro } from '@/lib/modulos/tarros/repositorio';
 
 const CANTIDAD_LECTURAS_RECIENTES = 8;
+const COLOR_SIN_DATOS = '#555';
 
-interface AlertaLote {
-  id: number;
-  nivel: 'Amarilla' | 'Roja';
-  mensaje: string;
-  congela_registro: boolean;
-  timestamp: Date;
-}
+type AlertaLote = Alerta;
 
 // Pantalla de monitoreo: detalle en vivo de un lote específico
 export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
   const { id } = await params;
-  const loteId = Number(id);
+  const { lote, muestra, lecturasRecientes, alertas, capturaActiva } = await cargarDatosLote(id);
 
-  // Un id que no es un entero positivo no puede ser un lote: se responde 404 sin consultar la base
-  if (!Number.isInteger(loteId) || loteId < 1) {
-    notFound();
-  }
-
-  const [lote, muestra, lecturasRecientes, alertas, capturaActiva] = await Promise.all([
-    obtenerLotePorId(loteId),
-    obtenerMuestraDeLote(loteId),
-    obtenerLecturasRecientesDeLote(loteId, CANTIDAD_LECTURAS_RECIENTES),
-    obtenerAlertasDeLote(loteId) as Promise<AlertaLote[]>,
-    obtenerCapturaActiva(),
-  ]);
-
-  if (!lote) {
-    notFound();
-  }
-
-  const ultimoTarro = lecturasRecientes[0];
-  const estaPausado = lote.estado === 'Pausado';
   // Las alertas vienen de la más reciente a la más antigua: la primera roja es la que pausó el lote
   const alertaQuePauso = alertas.find((alerta) => alerta.nivel === 'Roja');
   // Solo interesa la captura activa si es de otro lote: la de este lote ya está en lote.modo_captura
-  const capturaDeOtroLote =
-    capturaActiva && capturaActiva.loteId !== lote.id ? capturaActiva : null;
+  const capturaDeOtroLote = capturaActiva?.loteId !== lote.id ? capturaActiva : null;
 
   return (
     <main className="min-h-screen bg-surface text-on-surface">
@@ -57,7 +34,7 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
           <span className="text-on-surface-variant text-sm uppercase">{lote.estado}</span>
         </div>
 
-        {estaPausado && <AvisoLotePausado alertaQuePauso={alertaQuePauso} />}
+        {lote.estado === 'Pausado' && <AvisoLotePausado alertaQuePauso={alertaQuePauso} />}
 
         <ControlCaptura
           loteId={lote.id}
@@ -67,90 +44,124 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
           capturaDeOtroLote={capturaDeOtroLote}
         />
 
-        {/* Comparativa muestra vs último tarro */}
-        <div className="grid grid-cols-2 gap-4 bg-surface-container rounded-lg overflow-hidden">
-          <div>
-            <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">
-              Muestra Patrón
-            </div>
-            <div
-              className="h-40 flex items-end p-3"
-              style={{ backgroundColor: muestra?.resultado_hex || '#555' }}
-            >
-              <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs">
-                {muestra ? `Ref. ${muestra.resultado_hex}` : 'Sin muestra registrada'}
-              </span>
-            </div>
-          </div>
-          <div>
-            <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">
-              Último Tarro Leído
-            </div>
-            <div
-              className="h-40 flex items-end justify-between p-3"
-              style={{ backgroundColor: ultimoTarro?.resultado_hex || '#555' }}
-            >
-              {ultimoTarro && (
-                <>
-                  <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs tabular-nums">
-                    ΔE {formatearDeltaE(ultimoTarro.desviacion_delta_e)}
-                  </span>
-                  <InsigniaResultado
-                    resultado={ultimoTarro.resultado}
-                    desviacionDeltaE={ultimoTarro.desviacion_delta_e}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Historial reciente */}
-        <div className="bg-surface-container rounded-lg overflow-hidden">
-          <div className="bg-surface-container-high px-4 py-3 text-xs uppercase">
-            Historial Reciente del Lote
-          </div>
-          <table className="w-full text-left">
-            <thead className="text-xs uppercase text-on-surface-variant">
-              <tr>
-                <th className="px-5 py-3">ID de Tarro</th>
-                <th className="px-5 py-3">ΔE</th>
-                <th className="px-5 py-3">Hora</th>
-                <th className="px-5 py-3">Dictamen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lecturasRecientes.map((tarro) => (
-                <tr key={tarro.id_tarro} className="border-t border-surface-container-highest">
-                  <td className="px-5 py-3">#TR-{tarro.id_tarro}</td>
-                  <td className="px-5 py-3 font-bold tabular-nums">
-                    {formatearDeltaE(tarro.desviacion_delta_e)}
-                  </td>
-                  <td className="px-5 py-3">
-                    {new Date(tarro.timestamp).toLocaleTimeString('es-CO')}
-                  </td>
-                  <td className="px-5 py-3">
-                    <InsigniaResultado
-                      resultado={tarro.resultado}
-                      desviacionDeltaE={tarro.desviacion_delta_e}
-                    />
-                  </td>
-                </tr>
-              ))}
-              {lecturasRecientes.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-5 py-6 text-center text-on-surface-variant">
-                    Aún no hay lecturas en este lote.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
+        <ComparativaColores muestra={muestra} ultimoTarro={lecturasRecientes[0]} />
+        <TablaLecturasRecientes lecturas={lecturasRecientes} />
         <ListaAlertas alertas={alertas} />
       </section>
     </main>
+  );
+}
+
+// Consulta todo lo que muestra la pantalla. Responde 404 si el id no es válido o el lote no existe
+async function cargarDatosLote(id: string) {
+  const loteId = Number(id);
+  // Un id que no es un entero positivo no puede ser un lote: se responde 404 sin consultar la base
+  if (!Number.isInteger(loteId) || loteId < 1) {
+    notFound();
+  }
+
+  const [lote, muestra, lecturasRecientes, alertas, capturaActiva] = await Promise.all([
+    obtenerLotePorId(loteId),
+    obtenerMuestraDeLote(loteId),
+    obtenerLecturasRecientesDeLote(loteId, CANTIDAD_LECTURAS_RECIENTES),
+    obtenerAlertasDeLote(loteId),
+    obtenerCapturaActiva(),
+  ]);
+
+  if (!lote) {
+    notFound();
+  }
+  return { lote, muestra, lecturasRecientes, alertas, capturaActiva };
+}
+
+// Comparativa del color de la muestra patrón con el del último tarro leído
+function ComparativaColores({
+  muestra,
+  ultimoTarro,
+}: {
+  muestra: Tarro | null;
+  ultimoTarro: Tarro | undefined;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-4 bg-surface-container rounded-lg overflow-hidden">
+      <div>
+        <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">Muestra Patrón</div>
+        <div
+          className="h-40 flex items-end p-3"
+          style={{ backgroundColor: muestra?.resultado_hex || COLOR_SIN_DATOS }}
+        >
+          <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs">
+            {muestra ? `Ref. ${muestra.resultado_hex}` : 'Sin muestra registrada'}
+          </span>
+        </div>
+      </div>
+      <div>
+        <div className="bg-surface-container-high px-4 py-2 text-xs uppercase">
+          Último Tarro Leído
+        </div>
+        <div
+          className="h-40 flex items-end justify-between p-3"
+          style={{ backgroundColor: ultimoTarro?.resultado_hex || COLOR_SIN_DATOS }}
+        >
+          {ultimoTarro && (
+            <>
+              <span className="bg-surface-container-lowest/80 px-2 py-1 rounded text-xs tabular-nums">
+                ΔE {formatearDeltaE(ultimoTarro.desviacion_delta_e)}
+              </span>
+              <InsigniaResultado
+                resultado={ultimoTarro.resultado}
+                desviacionDeltaE={ultimoTarro.desviacion_delta_e}
+              />
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Tabla con las últimas lecturas del lote, de la más reciente a la más antigua
+function TablaLecturasRecientes({ lecturas }: { lecturas: Tarro[] }) {
+  return (
+    <div className="bg-surface-container rounded-lg overflow-hidden">
+      <div className="bg-surface-container-high px-4 py-3 text-xs uppercase">
+        Historial Reciente del Lote
+      </div>
+      <table className="w-full text-left">
+        <thead className="text-xs uppercase text-on-surface-variant">
+          <tr>
+            <th className="px-5 py-3">ID de Tarro</th>
+            <th className="px-5 py-3">ΔE</th>
+            <th className="px-5 py-3">Hora</th>
+            <th className="px-5 py-3">Dictamen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lecturas.map((tarro) => (
+            <tr key={tarro.id_tarro} className="border-t border-surface-container-highest">
+              <td className="px-5 py-3">#TR-{tarro.id_tarro}</td>
+              <td className="px-5 py-3 font-bold tabular-nums">
+                {formatearDeltaE(tarro.desviacion_delta_e)}
+              </td>
+              <td className="px-5 py-3">{new Date(tarro.timestamp).toLocaleTimeString('es-CO')}</td>
+              <td className="px-5 py-3">
+                <InsigniaResultado
+                  resultado={tarro.resultado}
+                  desviacionDeltaE={tarro.desviacion_delta_e}
+                />
+              </td>
+            </tr>
+          ))}
+          {lecturas.length === 0 && (
+            <tr>
+              <td colSpan={4} className="px-5 py-6 text-center text-on-surface-variant">
+                Aún no hay lecturas en este lote.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
