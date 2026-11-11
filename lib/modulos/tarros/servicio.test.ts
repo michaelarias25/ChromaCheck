@@ -133,14 +133,14 @@ describe('registrarLecturaDelSensor', () => {
     repo.buscarMuestraDeLote.mockResolvedValue(MUESTRA);
   });
 
-  test('CP-01: una lectura con ΔE 0,80 se aprueba sin alerta ni consulta del patrón', async () => {
-    const resultado = await registrarLecturaDelSensor(1, '#794FC8', [121, 79, 200]);
+  test('CP-01: una lectura con ΔE 8,00 se aprueba sin alerta ni consulta del patrón', async () => {
+    const resultado = await registrarLecturaDelSensor(1, '#7858C3', [120, 88, 195]);
 
     expect(resultado).toMatchObject({ tipo: 'registrado' });
     expect(repo.insertarTarro).toHaveBeenCalledWith({
       loteId: 1,
-      resultadoHex: '#794FC8',
-      desviacionDeltaE: 0.8,
+      resultadoHex: '#7858C3',
+      desviacionDeltaE: 8,
       resultado: 'Aprobado',
       esMuestra: false,
     });
@@ -148,28 +148,28 @@ describe('registrarLecturaDelSensor', () => {
     expect(mockCrearAlerta).not.toHaveBeenCalled();
   });
 
-  test('CP-02 y CP-05: una lectura con ΔE 0,81 sin patrón da solo alerta Amarilla', async () => {
-    repo.buscarUltimasDesviacionesDeLote.mockResolvedValue([0.3, 0.3, 0.81]);
+  test('CP-02 y CP-05: una lectura con ΔE 8,01 sin patrón da solo alerta Amarilla', async () => {
+    repo.buscarUltimasDesviacionesDeLote.mockResolvedValue([3.0, 3.0, 8.01]);
 
-    await registrarLecturaDelSensor(1, '#764FC8', [118, 79, 200]);
+    await registrarLecturaDelSensor(1, '#7849CF', [120, 73, 207]);
 
     expect(repo.insertarTarro).toHaveBeenCalledWith(
-      expect.objectContaining({ desviacionDeltaE: 0.81, resultado: 'No Aprobado' })
+      expect.objectContaining({ desviacionDeltaE: 8.01, resultado: 'No Aprobado' })
     );
     expect(repo.buscarUltimasDesviacionesDeLote).toHaveBeenCalledWith(1, 3);
     expect(mockCrearAlerta).toHaveBeenCalledWith(
       99,
       'Amarilla',
-      'Desviación aislada de 0.81 ΔE',
+      'Desviación aislada de 8.01 ΔE',
       false
     );
     expect(mockPausarLote).not.toHaveBeenCalled();
   });
 
   test('CP-04: tres lecturas crecientes con la última fuera de tolerancia dan alerta Roja y pausan el lote', async () => {
-    repo.buscarUltimasDesviacionesDeLote.mockResolvedValue([0.3, 0.6, 0.81]);
+    repo.buscarUltimasDesviacionesDeLote.mockResolvedValue([3.0, 5.5, 8.01]);
 
-    await registrarLecturaDelSensor(1, '#764FC8', [118, 79, 200]);
+    await registrarLecturaDelSensor(1, '#7849CF', [120, 73, 207]);
 
     expect(mockCrearAlerta).toHaveBeenCalledWith(
       99,

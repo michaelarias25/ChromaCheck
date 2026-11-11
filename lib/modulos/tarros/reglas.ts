@@ -22,7 +22,7 @@ export interface LoteParaRegistro {
 }
 
 // ACQ-04: una lectura con deltaE mayor que este valor no se aprueba
-export const UMBRAL_TOLERANCIA_DELTA_E = 0.8;
+export const UMBRAL_TOLERANCIA_DELTA_E = 8.0;
 
 // Cantidad de lecturas seguidas que se revisan para detectar una desviación acumulativa
 export const LECTURAS_PATRON_ACUMULATIVO = 3;
@@ -75,7 +75,7 @@ export function calcularDesviacionDeltaE(rgbMuestra: ColorRgb, rgbTarro: ColorRg
   return Math.round(deltaE * 100) / 100;
 }
 
-// Determina si una desviación deltaE supera el límite de tolerancia (0.8 por defecto)
+// Determina si una desviación deltaE supera el límite de tolerancia (8.0 por defecto)
 export function excedeToleranciaDeltaE(
   desviacionDeltaE: number,
   limite = UMBRAL_TOLERANCIA_DELTA_E
