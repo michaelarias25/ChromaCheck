@@ -49,7 +49,7 @@ Plataforma web de control de calidad para una fábrica de pintura. Un prototipo 
 
 Las pruebas unitarias están junto al código que prueban (`lib/modulos/<modulo>/*.test.ts`) y no necesitan la base de datos ni el servidor:
 
-- `reglas.test.ts`: funciones puras, incluidos los casos documentados CP-01 a CP-05 (deltaE CIE76, umbral 0,8 y alertas).
+- `reglas.test.ts`: funciones puras, incluidos los casos documentados CP-01 a CP-05 (deltaE CIE76, umbral 8,0 y alertas).
 - `servicio.test.ts`: la orquestación, con el repositorio simulado (`jest.mock`): modos de captura, pausa por alerta roja y errores.
 - `repositorio.test.ts`: las consultas SQL y sus parámetros, con el pool de PostgreSQL simulado.
 
