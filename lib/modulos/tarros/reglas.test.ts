@@ -17,16 +17,16 @@ import {
 const MARGEN_DELTA_E = 0.5;
 
 describe('casos de prueba documentados (CP)', () => {
-  test('CP-01: muestra (120,80,200) y lectura (121,79,200) dan ΔE 0,80 y se aprueba', () => {
-    const desviacion = calcularDesviacionDeltaE([120, 80, 200], [121, 79, 200]);
-    expect(desviacion).toBe(0.8);
+  test('CP-01: muestra (120,80,200) y lectura (120,88,195) dan ΔE 8,00 y se aprueba', () => {
+    const desviacion = calcularDesviacionDeltaE([120, 80, 200], [120, 88, 195]);
+    expect(desviacion).toBe(8);
     expect(obtenerResultadoLectura(desviacion)).toBe('Aprobado');
     expect(obtenerNivelAlerta(desviacion, false)).toBeNull();
   });
 
-  test('CP-02: lectura (118,79,200) da ΔE 0,81 y no se aprueba', () => {
-    const desviacion = calcularDesviacionDeltaE([120, 80, 200], [118, 79, 200]);
-    expect(desviacion).toBe(0.81);
+  test('CP-02: lectura (120,73,207) da ΔE 8,01 y no se aprueba', () => {
+    const desviacion = calcularDesviacionDeltaE([120, 80, 200], [120, 73, 207]);
+    expect(desviacion).toBe(8.01);
     expect(obtenerResultadoLectura(desviacion)).toBe('No Aprobado');
   });
 
@@ -42,16 +42,16 @@ describe('casos de prueba documentados (CP)', () => {
     }
   );
 
-  test('CP-04: ΔE 0,3 → 0,9 → 1,3 forma un patrón acumulativo y da alerta Roja', () => {
-    const esPatron = formanPatronAcumulativo([0.3, 0.9, 1.3]);
+  test('CP-04: ΔE 3,0 → 5,5 → 8,5 forma un patrón acumulativo y da alerta Roja', () => {
+    const esPatron = formanPatronAcumulativo([3.0, 5.5, 8.5]);
     expect(esPatron).toBe(true);
-    expect(obtenerNivelAlerta(1.3, esPatron)).toBe('Roja');
+    expect(obtenerNivelAlerta(8.5, esPatron)).toBe('Roja');
   });
 
-  test('CP-05: ΔE 0,3 → 0,3 → 0,9 no forma patrón y da solo alerta Amarilla', () => {
-    const esPatron = formanPatronAcumulativo([0.3, 0.3, 0.9]);
+  test('CP-05: ΔE 3,0 → 3,0 → 8,5 no forma patrón y da solo alerta Amarilla', () => {
+    const esPatron = formanPatronAcumulativo([3.0, 3.0, 8.5]);
     expect(esPatron).toBe(false);
-    expect(obtenerNivelAlerta(0.9, esPatron)).toBe('Amarilla');
+    expect(obtenerNivelAlerta(8.5, esPatron)).toBe('Amarilla');
   });
 });
 
@@ -80,14 +80,14 @@ describe('convertirRgbALab', () => {
   });
 });
 
-describe('tolerancia y resultado (umbral 0,8)', () => {
-  test('el umbral es 0,8 (ACQ-04)', () => {
-    expect(UMBRAL_TOLERANCIA_DELTA_E).toBe(0.8);
+describe('tolerancia y resultado (umbral 8,0)', () => {
+  test('el umbral es 8,0 (ACQ-04)', () => {
+    expect(UMBRAL_TOLERANCIA_DELTA_E).toBe(8);
   });
 
-  test('0,8 está dentro de la tolerancia; 0,81 la supera', () => {
-    expect(excedeToleranciaDeltaE(0.8)).toBe(false);
-    expect(excedeToleranciaDeltaE(0.81)).toBe(true);
+  test('8,0 está dentro de la tolerancia; 8,01 la supera', () => {
+    expect(excedeToleranciaDeltaE(8)).toBe(false);
+    expect(excedeToleranciaDeltaE(8.01)).toBe(true);
   });
 
   test('acepta otro límite', () => {
@@ -105,25 +105,25 @@ describe('convertirHexARgb', () => {
 describe('formanPatronAcumulativo', () => {
   test('con menos de 3 lecturas no hay patrón', () => {
     expect(formanPatronAcumulativo([])).toBe(false);
-    expect(formanPatronAcumulativo([0.9, 1.3])).toBe(false);
+    expect(formanPatronAcumulativo([5.5, 8.5])).toBe(false);
   });
 
   test('crecientes pero con la última dentro de tolerancia no es patrón', () => {
-    expect(formanPatronAcumulativo([0.1, 0.4, 0.8])).toBe(false);
+    expect(formanPatronAcumulativo([3.0, 5.5, 8.0])).toBe(false);
   });
 
   test('una bajada rompe el patrón', () => {
-    expect(formanPatronAcumulativo([0.9, 0.5, 1.3])).toBe(false);
+    expect(formanPatronAcumulativo([5.5, 3.0, 8.5])).toBe(false);
   });
 
   test('solo cuentan las 3 lecturas más recientes', () => {
-    expect(formanPatronAcumulativo([5, 0.3, 0.9, 1.3])).toBe(true);
+    expect(formanPatronAcumulativo([9.0, 3.0, 5.5, 8.5])).toBe(true);
   });
 });
 
 describe('construirAlerta', () => {
   test('la Roja congela el registro y avisa del patrón acumulativo', () => {
-    expect(construirAlerta('Roja', 1.3)).toEqual({
+    expect(construirAlerta('Roja', 8.5)).toEqual({
       nivel: 'Roja',
       mensaje: 'Desviación acumulativa detectada: revisar mezclador o posibles fugas',
       congelaRegistro: true,
@@ -131,9 +131,9 @@ describe('construirAlerta', () => {
   });
 
   test('la Amarilla no congela e incluye el deltaE', () => {
-    expect(construirAlerta('Amarilla', 0.95)).toEqual({
+    expect(construirAlerta('Amarilla', 8.5)).toEqual({
       nivel: 'Amarilla',
-      mensaje: 'Desviación aislada de 0.95 ΔE',
+      mensaje: 'Desviación aislada de 8.5 ΔE',
       congelaRegistro: false,
     });
   });
