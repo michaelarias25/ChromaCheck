@@ -70,7 +70,3 @@ Reglas que garantiza la base:
 | Reglas y servicios | Jest, cobertura ≥ 80 % (ACQ-03)                        | `lib/modulos/<modulo>/*.test.ts`      |
 | Puente serial      | pytest                                                 | `puente-serial/test_puente_serial.py` |
 | Firmware           | PlatformIO + Unity (entorno nativo, hardware simulado) | Aún no está en `development`          |
-
-## Despliegue
-
-Web y API en AWS; la base sigue en Neon. Ver [operacion/despliegue.md](operacion/despliegue.md).
