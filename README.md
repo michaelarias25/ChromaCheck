@@ -63,7 +63,7 @@ npm run test:cobertura        # pruebas y cobertura
 
 ### Crear un usuario
 
-No hay registro público: los usuarios se crean desde la terminal con `scripts/crear-usuario.ts` (detalles en [docs/autenticacion.md](docs/autenticacion.md)):
+No hay registro público: los usuarios se crean desde la terminal con `scripts/crear-usuario.ts` (detalles en [docs/contratos/autenticacion.md](docs/contratos/autenticacion.md)):
 
 ```bash
 node --env-file=.env.local --experimental-strip-types scripts/crear-usuario.ts <nombre_usuario> <contrasena>
@@ -94,7 +94,7 @@ En `/lotes/[id]`, un lote `Activo` decide qué hace el único sensor:
 
 Mientras el lote espera la muestra o recolecta, la página se refresca cada 3 segundos para mostrar la muestra, las lecturas y las alertas nuevas. Si la API rechaza un cambio, el mensaje aparece en texto.
 
-Los lotes se crean desde la pantalla principal; no se renombran. La API se documenta en [docs/api.md](docs/api.md). `POST /api/lotes` exige sesión iniciada; las demás rutas de la API quedan abiertas para el puente serial.
+Los lotes se crean desde la pantalla principal; no se renombran. La API se documenta en [docs/contratos/api.md](docs/contratos/api.md). `POST /api/lotes` exige sesión iniciada; las demás rutas de la API quedan abiertas para el puente serial.
 
 ## Estructura
 
@@ -111,7 +111,7 @@ public/               Logo e imágenes
 
 | Tabla      | Columnas                                                                                                                                                                                                                                                                                 |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `lotes`    | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `modo_captura` (`Inactivo` por defecto, `Muestra` o `Recoleccion`; ver [docs/api.md](docs/api.md)), `fecha_inicio` |
+| `lotes`    | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `modo_captura` (`Inactivo` por defecto, `Muestra` o `Recoleccion`; ver [docs/contratos/api.md](docs/contratos/api.md)), `fecha_inicio` |
 | `tarros`   | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp`                                                                                                                                 |
 | `alertas`  | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp`                                                                                                                                                                           |
 | `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion`                                                                                                                                                                                                                      |
