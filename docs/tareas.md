@@ -13,7 +13,7 @@ Las tareas ya terminadas antes de crear esta carpeta no se listan: su estado est
 
 ## 2. Identidad visual para mayores de 55 (todas las specs)
 
-- [ ] 2.1 Tokens de la paleta y fuente Atkinson Hyperlegible Next en `app/globals.css` y `app/layout.tsx`; encabezado oscuro con el logo
+- [ ] 2.1 Tokens de la paleta y fuente Atkinson Hyperlegible Next en `app/globals.css` y `app/layout.tsx`; encabezado según el tema, con el logo de letras negras o blancas (F7)
 - [ ] 2.2 Componente `Boton` (`app/componentes/Boton.tsx`) con variantes principal, secundario y peligro, alto de 56 o 72 px y estado "enviando"
 - [ ] 2.3 Componente `CuadroColor` (`app/componentes/CuadroColor.tsx`): color de la pintura con borde y código hex debajo
 - [ ] 2.4 Encabezado y navegación según [Navegación](diseno/identidad-visual.md#navegación): "Lotes" como inicio, "Historial" como enlace secundario, "Cerrar sesión" a la derecha, todos de 56 px de alto y sin mayúsculas sostenidas; "← Volver a lotes" en la pantalla del lote
@@ -43,3 +43,9 @@ Las tareas ya terminadas antes de crear esta carpeta no se listan: su estado est
 
 - [ ] 5.1 `lib/modulos/auth/servicio.ts` hace SQL: mover las consultas a `lib/modulos/auth/repositorio.ts`
 - [ ] 5.2 Proteger `POST /api/tarros` y `GET /api/captura/activa` con una clave compartida del puente (encabezado + variable de entorno), coordinado con Michael
+
+## 6. Fondo claro u oscuro (F7)
+
+- [ ] 6.1 `app/layout.tsx` usa `/logo.png`: usar `logo-negro.png` con fondo claro y `logo-blanco.png` con fondo oscuro
+- [ ] 6.2 Excluir `logo-blanco.png` y `logo-negro.png` en el `matcher` de `proxy.ts` para que el logo se vea en `/login` sin sesión
+- [ ] 6.3 Recortar `public/logo-negro.png` a la misma proporción que `logo-blanco.png` (1920 × 540)
