@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
-import { Inter, Montserrat } from 'next/font/google';
+import { Atkinson_Hyperlegible_Next, Inter, Montserrat } from 'next/font/google';
 import { cookies } from 'next/headers';
 import './globals.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import BotonCerrarSesion from './componentes/BotonCerrarSesion';
+
+// Fuente de identidad-visual.md: 400 para texto, 700 para títulos y botones
+const atkinson = Atkinson_Hyperlegible_Next({
+  variable: '--font-atkinson',
+  subsets: ['latin'],
+  weight: ['400', '700'],
+});
 
 const inter = Inter({
   variable: '--font-inter',
@@ -31,7 +38,7 @@ export default async function PlantillaPrincipal({ children }: LayoutProps<'/'>)
     <html
       lang="es"
       data-tema={tema}
-      className={`${inter.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${atkinson.variable} ${inter.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <header className="h-16 px-8 flex items-center justify-between border-b-2 border-borde bg-encabezado">

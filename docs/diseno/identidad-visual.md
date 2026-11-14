@@ -25,23 +25,25 @@ Equipo supuesto: el computador del taller (pantalla de 1366 × 768 o más) a uno
 
 Este es el tema claro, el de por defecto y el recomendado: fondo claro y texto oscuro. El encabezado sigue el tema elegido (ver [Tema oscuro](#tema-oscuro)). Los acentos del logo (azul, dorado y rojo) se convierten en los colores de estado.
 
-| Token                  | Hex       | Uso                                                | Contraste                        |
-| ---------------------- | --------- | -------------------------------------------------- | -------------------------------- |
-| `fondo`                | `#F4F5F7` | Fondo de las pantallas                             | —                                |
-| `superficie`           | `#FFFFFF` | Tarjetas, tablas, pantalla completa                | —                                |
-| `encabezado`           | `#FFFFFF` | Fondo del encabezado (logo de letras negras)       | —                                |
-| `texto`                | `#111418` | Texto principal                                    | 18,5:1 sobre `superficie`        |
-| `texto-secundario`     | `#3D4450` | Etiquetas, fechas, ayudas                          | 9,8:1 sobre `superficie`         |
-| `borde`                | `#6B7280` | Bordes de tarjetas, inputs y cuadros de color      | 4,8:1 (mínimo 3:1)               |
-| `accion`               | `#1F4E79` | Botón principal, enlaces, foco, estado "Esperando" | 8,7:1 con `texto-sobre-accion`   |
-| `texto-sobre-accion`   | `#FFFFFF` | Texto sobre `accion`                               | 8,7:1                            |
-| `aprobado`             | `#155C33` | Dictamen Aprobado, "Muestra guardada"              | 8,0:1 con `texto-sobre-aprobado` |
-| `texto-sobre-aprobado` | `#FFFFFF` | Texto sobre `aprobado`                             | 8,0:1                            |
-| `aprobado-suave`       | `#E3F4E8` | Fondo de avisos de éxito (texto `#14532D`)         | 8,0:1                            |
-| `alerta`               | `#B7860B` | Borde y franja de la alerta amarilla               | 3,3:1 (solo elemento gráfico)    |
-| `alerta-suave`         | `#FFF4D6` | Fondo de la alerta amarilla (texto `#5C4300`)      | 8,5:1                            |
-| `peligro`              | `#9B1C13` | No aprobado, alerta roja, lote pausado, "Detener"  | 8,2:1 con `texto-sobre-peligro`  |
-| `texto-sobre-peligro`  | `#FFFFFF` | Texto sobre `peligro`                              | 8,2:1                            |
+| Token                        | Hex       | Uso                                                | Contraste                        |
+| ---------------------------- | --------- | -------------------------------------------------- | -------------------------------- |
+| `fondo`                      | `#F4F5F7` | Fondo de las pantallas                             | —                                |
+| `superficie`                 | `#FFFFFF` | Tarjetas, tablas, pantalla completa                | —                                |
+| `encabezado`                 | `#FFFFFF` | Fondo del encabezado (logo de letras negras)       | —                                |
+| `texto`                      | `#111418` | Texto principal                                    | 18,5:1 sobre `superficie`        |
+| `texto-secundario`           | `#3D4450` | Etiquetas, fechas, ayudas                          | 9,8:1 sobre `superficie`         |
+| `borde`                      | `#6B7280` | Bordes de tarjetas, inputs y cuadros de color      | 4,8:1 (mínimo 3:1)               |
+| `accion`                     | `#1F4E79` | Botón principal, enlaces, foco, estado "Esperando" | 8,7:1 con `texto-sobre-accion`   |
+| `texto-sobre-accion`         | `#FFFFFF` | Texto sobre `accion`                               | 8,7:1                            |
+| `aprobado`                   | `#155C33` | Dictamen Aprobado, "Muestra guardada"              | 8,0:1 con `texto-sobre-aprobado` |
+| `texto-sobre-aprobado`       | `#FFFFFF` | Texto sobre `aprobado`                             | 8,0:1                            |
+| `aprobado-suave`             | `#E3F4E8` | Fondo de avisos de éxito                           | —                                |
+| `texto-sobre-aprobado-suave` | `#14532D` | Texto sobre `aprobado-suave`                       | 8,0:1                            |
+| `alerta`                     | `#B7860B` | Borde y franja de la alerta amarilla               | 3,3:1 (solo elemento gráfico)    |
+| `alerta-suave`               | `#FFF4D6` | Fondo de la alerta amarilla                        | —                                |
+| `texto-sobre-alerta-suave`   | `#5C4300` | Texto sobre `alerta-suave`                         | 8,5:1                            |
+| `peligro`                    | `#9B1C13` | No aprobado, alerta roja, lote pausado, "Detener"  | 8,2:1 con `texto-sobre-peligro`  |
+| `texto-sobre-peligro`        | `#FFFFFF` | Texto sobre `peligro`                              | 8,2:1                            |
 
 Significado fijo de los colores:
 
@@ -58,23 +60,25 @@ El color de la pintura (`resultado_hex`) es el único color que no viene de la p
 
 El operario puede elegir fondo oscuro con el control "Fondo:" del encabezado ([F7](../specs/F7-fondo-claro-oscuro.md)). El tema claro es el de por defecto y sigue siendo el recomendado. Los tokens tienen los mismos nombres que en el tema claro; solo cambian sus valores, así los componentes no dependen del tema.
 
-| Token                  | Hex       | Uso                                                | Contraste                         |
-| ---------------------- | --------- | -------------------------------------------------- | --------------------------------- |
-| `fondo`                | `#101418` | Fondo de las pantallas                             | —                                 |
-| `superficie`           | `#1C2025` | Tarjetas, tablas, pantalla completa                | —                                 |
-| `encabezado`           | `#101418` | Fondo del encabezado (logo de letras blancas)      | —                                 |
-| `texto`                | `#F4F5F7` | Texto principal                                    | 15,0:1 sobre `superficie`         |
-| `texto-secundario`     | `#C9CED6` | Etiquetas, fechas, ayudas                          | 10,4:1 sobre `superficie`         |
-| `borde`                | `#8A929E` | Bordes de tarjetas, inputs y cuadros de color      | 5,2:1 (mínimo 3:1)                |
-| `accion`               | `#9CC3EE` | Botón principal, enlaces, foco, estado "Esperando" | 10,1:1 con `texto-sobre-accion`   |
-| `texto-sobre-accion`   | `#101418` | Texto sobre `accion`                               | 10,1:1                            |
-| `aprobado`             | `#7EE2A8` | Dictamen Aprobado, "Muestra guardada"              | 11,7:1 con `texto-sobre-aprobado` |
-| `texto-sobre-aprobado` | `#101418` | Texto sobre `aprobado`                             | 11,7:1                            |
-| `aprobado-suave`       | `#12301F` | Fondo de avisos de éxito (texto `#A7F3C1`)         | 11,1:1                            |
-| `alerta`               | `#E0B23A` | Borde y franja de la alerta amarilla               | 8,3:1 sobre `superficie`          |
-| `alerta-suave`         | `#3A2E05` | Fondo de la alerta amarilla (texto `#FFE08A`)      | 10,4:1                            |
-| `peligro`              | `#FF9C94` | No aprobado, alerta roja, lote pausado, "Detener"  | 9,2:1 con `texto-sobre-peligro`   |
-| `texto-sobre-peligro`  | `#101418` | Texto sobre `peligro`                              | 9,2:1                             |
+| Token                        | Hex       | Uso                                                | Contraste                         |
+| ---------------------------- | --------- | -------------------------------------------------- | --------------------------------- |
+| `fondo`                      | `#101418` | Fondo de las pantallas                             | —                                 |
+| `superficie`                 | `#1C2025` | Tarjetas, tablas, pantalla completa                | —                                 |
+| `encabezado`                 | `#101418` | Fondo del encabezado (logo de letras blancas)      | —                                 |
+| `texto`                      | `#F4F5F7` | Texto principal                                    | 15,0:1 sobre `superficie`         |
+| `texto-secundario`           | `#C9CED6` | Etiquetas, fechas, ayudas                          | 10,4:1 sobre `superficie`         |
+| `borde`                      | `#8A929E` | Bordes de tarjetas, inputs y cuadros de color      | 5,2:1 (mínimo 3:1)                |
+| `accion`                     | `#9CC3EE` | Botón principal, enlaces, foco, estado "Esperando" | 10,1:1 con `texto-sobre-accion`   |
+| `texto-sobre-accion`         | `#101418` | Texto sobre `accion`                               | 10,1:1                            |
+| `aprobado`                   | `#7EE2A8` | Dictamen Aprobado, "Muestra guardada"              | 11,7:1 con `texto-sobre-aprobado` |
+| `texto-sobre-aprobado`       | `#101418` | Texto sobre `aprobado`                             | 11,7:1                            |
+| `aprobado-suave`             | `#12301F` | Fondo de avisos de éxito                           | —                                 |
+| `texto-sobre-aprobado-suave` | `#A7F3C1` | Texto sobre `aprobado-suave`                       | 11,1:1                            |
+| `alerta`                     | `#E0B23A` | Borde y franja de la alerta amarilla               | 8,3:1 sobre `superficie`          |
+| `alerta-suave`               | `#3A2E05` | Fondo de la alerta amarilla                        | —                                 |
+| `texto-sobre-alerta-suave`   | `#FFE08A` | Texto sobre `alerta-suave`                         | 10,4:1                            |
+| `peligro`                    | `#FF9C94` | No aprobado, alerta roja, lote pausado, "Detener"  | 9,2:1 con `texto-sobre-peligro`   |
+| `texto-sobre-peligro`        | `#101418` | Texto sobre `peligro`                              | 9,2:1                             |
 
 - El encabezado sigue el tema: en el claro es `encabezado` blanco con `logo-negro.png` (letras negras); en el oscuro, `#101418` con `logo-blanco.png` (letras blancas). En los dos lleva un borde inferior de 2 px `borde`. El logo cambia al pulsar "Claro" u "Oscuro", sin recargar y sin parpadeo.
 - El color de la pintura (`resultado_hex`) no cambia con el tema; el borde de 2 px del cuadro lo separa del fondo aunque la pintura sea oscura.

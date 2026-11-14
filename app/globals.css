@@ -5,8 +5,27 @@
 
 @theme {
   /* Tokens de identidad-visual.md: valores del tema claro, el de por defecto */
+  --color-fondo: #f4f5f7;
+  --color-superficie: #ffffff;
   --color-encabezado: #ffffff;
+  --color-texto: #111418;
+  --color-texto-secundario: #3d4450;
   --color-borde: #6b7280;
+  --color-accion: #1f4e79;
+  --color-texto-sobre-accion: #ffffff;
+  --color-aprobado: #155c33;
+  --color-texto-sobre-aprobado: #ffffff;
+  --color-aprobado-suave: #e3f4e8;
+  --color-texto-sobre-aprobado-suave: #14532d;
+  --color-alerta: #b7860b;
+  --color-alerta-suave: #fff4d6;
+  --color-texto-sobre-alerta-suave: #5c4300;
+  --color-peligro: #9b1c13;
+  --color-texto-sobre-peligro: #ffffff;
+
+  --font-texto: var(--font-atkinson), 'Atkinson Hyperlegible Next', sans-serif;
+
+  /* Tokens antiguos: conviven con los nuevos hasta la tarea 2.10 */
 
   --color-surface: #101418;
   --color-surface-container: #1c2025;
@@ -34,12 +53,27 @@
 
 /* Mismos tokens con los valores del tema oscuro */
 [data-tema='oscuro'] {
+  --color-fondo: #101418;
+  --color-superficie: #1c2025;
   --color-encabezado: #101418;
+  --color-texto: #f4f5f7;
+  --color-texto-secundario: #c9ced6;
   --color-borde: #8a929e;
+  --color-accion: #9cc3ee;
+  --color-texto-sobre-accion: #101418;
+  --color-aprobado: #7ee2a8;
+  --color-texto-sobre-aprobado: #101418;
+  --color-aprobado-suave: #12301f;
+  --color-texto-sobre-aprobado-suave: #a7f3c1;
+  --color-alerta: #e0b23a;
+  --color-alerta-suave: #3a2e05;
+  --color-texto-sobre-alerta-suave: #ffe08a;
+  --color-peligro: #ff9c94;
+  --color-texto-sobre-peligro: #101418;
 }
 
 body {
-  background: var(--color-surface);
-  color: var(--color-on-surface);
-  font-family: var(--font-body);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--font-texto);
 }
