@@ -78,13 +78,13 @@ Cambia el modo de captura del lote. La usa solo la web, por eso exige la cookie 
 
 Las alertas y las lecturas anteriores se conservan. Si la desviación sigue en aumento, la siguiente lectura vuelve a pausar el lote.
 
-| Código | Caso                                                    |
-| ------ | ------------------------------------------------------- |
-| 200    | Lote reanudado; devuelve el lote actualizado            |
-| 400    | El id no es un entero positivo                          |
-| 401    | No hay sesión válida                                    |
-| 404    | El lote no existe                                       |
-| 409    | El lote no está `Pausado` u otro lote está capturando   |
+| Código | Caso                                                  |
+| ------ | ----------------------------------------------------- |
+| 200    | Lote reanudado; devuelve el lote actualizado          |
+| 400    | El id no es un entero positivo                        |
+| 401    | No hay sesión válida                                  |
+| 404    | El lote no existe                                     |
+| 409    | El lote no está `Pausado` u otro lote está capturando |
 
 ### `GET /api/captura/activa`
 
