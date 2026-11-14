@@ -25,10 +25,10 @@ Ya en `development`:
 
 Pendientes (identidad visual):
 
-- [ ] Campos de 56 px de alto con etiqueta visible "Usuario" y "Contraseña" (sin mayúsculas sostenidas).
-- [ ] Botón "Mostrar contraseña" con texto, para revisar lo escrito.
-- [ ] Botón "Ingresar" principal de 72 px de alto y ancho completo del formulario.
-- [ ] El error aparece debajo del botón, en texto de 18 px con "⚠", y no se borra solo.
+- [x] Campos de 56 px de alto con etiqueta visible "Usuario" y "Contraseña" (sin mayúsculas sostenidas).
+- [x] Botón "Mostrar contraseña" con texto, para revisar lo escrito.
+- [x] Botón "Ingresar" principal de 72 px de alto y ancho completo del formulario.
+- [x] El error aparece debajo del botón, en texto de 18 px con "⚠", y no se borra solo.
 
 ## Fuera de alcance
 

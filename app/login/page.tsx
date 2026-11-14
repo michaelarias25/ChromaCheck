@@ -2,12 +2,17 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Boton from '../componentes/Boton';
+
+const CLASES_CAMPO =
+  'h-14 w-full rounded-lg border-2 border-borde bg-superficie px-4 text-lg text-texto focus-visible:outline-4 focus-visible:outline-offset-3 focus-visible:outline-accion';
 
 // Pantalla de inicio de sesión con usuario y contraseña
 export default function PaginaLogin() {
   const router = useRouter();
   const [nombreUsuario, setNombreUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
+  const [estaContrasenaVisible, setEstaContrasenaVisible] = useState(false);
   const [mensajeError, setMensajeError] = useState('');
   const [estaEnviando, setEstaEnviando] = useState(false);
 
@@ -32,57 +37,78 @@ export default function PaginaLogin() {
       router.push('/');
       router.refresh();
     } catch {
-      setMensajeError('No se pudo conectar con el servidor');
+      setMensajeError(
+        'No se pudo conectar con el servidor. Revise la conexión e intente de nuevo.'
+      );
     } finally {
       setEstaEnviando(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-surface text-on-surface flex items-center justify-center px-6">
+    <main className="flex flex-1 items-center justify-center bg-fondo px-4 py-10 text-texto">
       <form
         onSubmit={iniciarSesion}
-        className="w-full max-w-sm bg-surface-container rounded-lg shadow-md p-8 space-y-5"
+        className="w-full max-w-md space-y-6 rounded-lg border-2 border-borde bg-superficie p-8"
       >
-        <h1 className="font-headline text-2xl font-bold uppercase">Iniciar sesión</h1>
+        <h1 className="text-3xl font-bold">Iniciar sesión</h1>
 
-        <label className="block space-y-1">
-          <span className="text-xs uppercase text-on-surface-variant">Usuario</span>
+        <div className="space-y-2">
+          <label htmlFor="usuario" className="block text-base font-bold">
+            Usuario
+          </label>
           <input
+            id="usuario"
             type="text"
             value={nombreUsuario}
             onChange={(evento) => setNombreUsuario(evento.target.value)}
             autoComplete="username"
             required
-            className="w-full h-10 px-3 rounded bg-surface-container-high text-on-surface outline-none focus:ring-2 focus:ring-secondary"
+            className={CLASES_CAMPO}
           />
-        </label>
+        </div>
 
-        <label className="block space-y-1">
-          <span className="text-xs uppercase text-on-surface-variant">Contraseña</span>
+        <div className="space-y-2">
+          <label htmlFor="contrasena" className="block text-base font-bold">
+            Contraseña
+          </label>
           <input
-            type="password"
+            id="contrasena"
+            type={estaContrasenaVisible ? 'text' : 'password'}
             value={contrasena}
             onChange={(evento) => setContrasena(evento.target.value)}
             autoComplete="current-password"
             required
-            className="w-full h-10 px-3 rounded bg-surface-container-high text-on-surface outline-none focus:ring-2 focus:ring-secondary"
+            className={CLASES_CAMPO}
           />
-        </label>
+          {/* Permite revisar lo escrito antes de entrar */}
+          <Boton
+            variante="secundario"
+            aria-controls="contrasena"
+            aria-pressed={estaContrasenaVisible}
+            onClick={() => setEstaContrasenaVisible(!estaContrasenaVisible)}
+          >
+            {estaContrasenaVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          </Boton>
+        </div>
 
+        <Boton
+          type="submit"
+          esGrande
+          estaEnviando={estaEnviando}
+          textoEnviando="Ingresando…"
+          className="w-full"
+        >
+          Ingresar
+        </Boton>
+
+        {/* El error queda debajo del botón y no se borra solo */}
         {mensajeError && (
-          <p role="alert" className="text-sm text-primary">
+          <p role="alert" className="text-lg text-peligro">
+            <span aria-hidden="true">⚠ </span>
             {mensajeError}
           </p>
         )}
-
-        <button
-          type="submit"
-          disabled={estaEnviando}
-          className="w-full h-10 rounded bg-primary-container text-on-primary-container font-headline text-xs uppercase tracking-wider transition hover:opacity-90 disabled:opacity-50"
-        >
-          {estaEnviando ? 'Ingresando...' : 'Ingresar'}
-        </button>
       </form>
     </main>
   );
