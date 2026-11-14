@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -22,19 +23,35 @@ export const metadata: Metadata = {
   description: 'Sistema de control espectrométrico industrial',
 };
 
-export default function PlantillaPrincipal({ children }: LayoutProps<'/'>) {
+export default async function PlantillaPrincipal({ children }: LayoutProps<'/'>) {
+  // El tema llega en el HTML desde el servidor para que la página no parpadee al cargar (F7)
+  const tema = (await cookies()).get('tema')?.value === 'oscuro' ? 'oscuro' : 'claro';
+
   return (
-    <html lang="es" className={`${inter.variable} ${montserrat.variable} h-full antialiased`}>
+    <html
+      lang="es"
+      data-tema={tema}
+      className={`${inter.variable} ${montserrat.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
-        <header className="h-16 px-8 flex items-center justify-between border-b-2 border-surface-container-highest bg-surface-container-lowest">
+        <header className="h-16 px-8 flex items-center justify-between border-b-2 border-borde bg-encabezado">
+          {/* Los dos logos están en el HTML y el CSS muestra el del tema: el cambio no recarga la página */}
           <div className="flex items-center h-10 w-auto">
             <Image
-              src="/logo.png"
+              src="/logo-negro.png"
+              alt="Chroma Check Logo"
+              width={40}
+              height={40}
+              preload={tema === 'claro'}
+              className="h-full w-auto object-contain oscuro:hidden"
+            />
+            <Image
+              src="/logo-blanco.png"
               alt="Chroma Check Logo"
               width={142}
               height={40}
-              priority
-              className="h-full w-auto object-contain"
+              preload={tema === 'oscuro'}
+              className="hidden h-full w-auto object-contain oscuro:block"
             />
           </div>
 

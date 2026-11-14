@@ -46,6 +46,6 @@ Las tareas ya terminadas antes de crear esta carpeta no se listan: su estado est
 
 ## 6. Fondo claro u oscuro (F7)
 
-- [ ] 6.1 `app/layout.tsx` usa `/logo.png`: usar `logo-negro.png` con fondo claro y `logo-blanco.png` con fondo oscuro
+- [x] 6.1 `app/layout.tsx` usa `/logo.png`: usar `logo-negro.png` con fondo claro y `logo-blanco.png` con fondo oscuro
 - [ ] 6.2 Excluir `logo-blanco.png` y `logo-negro.png` en el `matcher` de `proxy.ts` para que el logo se vea en `/login` sin sesión
 - [ ] 6.3 Recortar `public/logo-negro.png` a la misma proporción que `logo-blanco.png` (1920 × 540)
