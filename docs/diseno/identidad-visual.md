@@ -195,14 +195,19 @@ El flujo principal es **Abrir lote → Tomar muestra patrón → Revisar tarros*
 
 ## Distribución de las pantallas
 
-- Ancho máximo del contenido: 1200 px, alineado a la izquierda.
+- Ancho máximo del contenido: 1200 px, centrado en la pantalla (`mx-auto`); el texto dentro va alineado a la izquierda.
 - Debajo del título de la pantalla va la acción principal, siempre en el mismo lugar.
 - 24 px entre bloques; tarjetas y botones con esquinas de 8 px; bordes de 1 a 2 px en lugar de sombras.
 - Diseñar primero para 1366 × 768, verificar en 768 px (tablet) y que nada se corte en 390 px.
 
 ## Referencias
 
-En [referencias/](referencias/): capturas de las pantallas antes y después del cambio, y una foto del puesto del sensor en el taller (iluminación y distancia a la pantalla).
+Pantallas de referencia de F7 y de la pantalla completa de captura (el logo negro es una aproximación):
+
+- [Pantalla del lote con fondo claro](referencias/vista-previa-claro.png)
+- [Pantalla del lote con fondo oscuro](referencias/vista-previa-oscuro.png)
+- [Pantalla completa de captura con fondo claro](referencias/pantalla-completa-claro.png)
+- [Pantalla completa de captura con fondo oscuro](referencias/pantalla-completa-oscuro.png)
 
 ## Fuentes
 
