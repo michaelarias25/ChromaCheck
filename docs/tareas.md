@@ -24,7 +24,7 @@ Migración visual (rama `feature/migracion-visual`), en este orden: 2.1 → 6.3 
 - [x] 2.7 F6 · Historial: tabla en 18 px y paginación con botones de 56 px
 - [x] 2.8 `InsigniaResultado` con la paleta nueva (verde, rojo) y tamaño de 18 px
 - [x] 2.9 Pantalla del lote (`app/lotes/[id]/page.tsx` y `ControlCaptura`) con la paleta nueva, sin la pantalla completa de la sección 3: botón principal "Tomar muestra patrón" o "Revisar tarros" con "■ El sensor está detenido"; mientras espera la muestra, "● Esperando el tarro…" con "Cancelar"; mientras revisa, "● Revisando tarros…" con "Terminar revisión"; `CuadroColor` en la comparación, tabla y alertas en 18 px; textos nuevos en `README.md`
-- [ ] 2.10 Borrar los tokens antiguos (`surface-*`, `primary-*`, `secondary-*`, `tertiary-*`, `outline`) y las fuentes Inter y Montserrat
+- [x] 2.10 Borrar los tokens antiguos (`surface-*`, `primary-*`, `secondary-*`, `tertiary-*`, `outline`) y las fuentes Inter y Montserrat
 
 ## 3. Pantalla completa de captura (F3, F4, F5)
 

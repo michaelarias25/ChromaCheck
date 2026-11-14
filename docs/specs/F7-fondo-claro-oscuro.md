@@ -24,21 +24,21 @@ Pendientes:
 - [x] El encabezado muestra "Fondo:" seguido de los botones "Claro" y "Oscuro", con texto y sin mayúsculas sostenidas.
 - [x] Los dos botones miden 56 px de alto.
 - [x] El botón del tema activo muestra "✓" y tiene `aria-pressed="true"`; el otro tiene `aria-pressed="false"`.
-- [ ] Sin la cookie `tema` (ventana privada), la aplicación se ve con fondo claro.
-- [ ] Al pulsar "Oscuro", el fondo cambia sin recargar la página.
+- [x] Sin la cookie `tema` (ventana privada), la aplicación se ve con fondo claro.
+- [x] Al pulsar "Oscuro", el fondo cambia sin recargar la página.
 - [x] Después de elegir "Oscuro", la cookie `tema` vale `oscuro` y vence en 1 año.
-- [ ] Al recargar con fondo oscuro, la página no muestra el fondo claro ni por un instante.
+- [x] Al recargar con fondo oscuro, la página no muestra el fondo claro ni por un instante.
 - [x] El código fuente de la página (Ver código fuente) ya trae `data-tema` en `<html>`.
-- [ ] El control y el tema elegido se ven en `/login`, `/`, `/lotes/[id]` y `/historial`.
+- [x] El control y el tema elegido se ven en `/login`, `/`, `/lotes/[id]` y `/historial`.
 - [ ] La pantalla completa de captura usa el tema elegido.
 - [x] Con fondo claro, el encabezado es blanco y muestra el logo de letras negras.
 - [x] Con fondo oscuro, el encabezado es `#101418` y muestra el logo de letras blancas.
 - [x] En los dos temas, el encabezado tiene un borde inferior de 2 px.
 - [x] Al pulsar "Claro" u "Oscuro", el logo cambia sin recargar la página.
-- [ ] Al recargar, no aparece el logo del otro tema ni por un instante.
+- [x] Al recargar, no aparece el logo del otro tema ni por un instante.
 - [x] En `/login`, sin sesión, el logo se ve en los dos temas (no aparece una imagen rota).
-- [ ] El cuadro de color de un tarro muestra el mismo hex en los dos temas.
-- [ ] Un cuadro de color oscuro (por ejemplo `#101418`) se distingue del fondo oscuro gracias a su borde.
+- [x] El cuadro de color de un tarro muestra el mismo hex en los dos temas.
+- [x] Un cuadro de color oscuro (por ejemplo `#101418`) se distingue del fondo oscuro gracias a su borde.
 - [ ] Con la herramienta de contraste del navegador, todo el texto da 7:1 o más en los dos temas.
 - [ ] A 390 px de ancho, el control no se corta ni provoca desplazamiento horizontal.
 
