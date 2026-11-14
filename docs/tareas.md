@@ -7,7 +7,7 @@ Las tareas ya terminadas antes de crear esta carpeta no se listan: su estado est
 ## 1. Documentación (rama `feature/carpeta-docs`)
 
 - [x] 1.1 Crear la estructura de `docs/` y mover `api.md` y `autenticacion.md` a `docs/contratos/`
-- [ ] 1.2 Actualizar los enlaces a `docs/api.md` y `docs/autenticacion.md` (`README.md`, `docs/contratos/` y referencias de `puente-serial/`)
+- [x] 1.2 Actualizar los enlaces a `docs/api.md` y `docs/autenticacion.md` (`README.md`, `docs/contratos/` y referencias de `puente-serial/`); lo de `puente-serial/` lo cierra Michael en la tarea 3.9
 - [ ] 1.3 Agregar la skill `.claude/skills/ui-componentes/SKILL.md`
 - [ ] 1.4 Confirmar con el equipo las decisiones marcadas como **Propuesta** en `decisiones.md`
 
