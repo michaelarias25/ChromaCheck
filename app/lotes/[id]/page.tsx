@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ControlCaptura from '@/app/componentes/ControlCaptura';
 import InsigniaResultado from '@/app/componentes/InsigniaResultado';
@@ -30,6 +31,12 @@ export default async function PaginaLote({ params }: PageProps<'/lotes/[id]'>) {
     <main className="min-h-screen bg-surface text-on-surface">
       <section className="max-w-6xl mx-auto px-6 py-10 space-y-6">
         <div>
+          <Link
+            href="/"
+            className="inline-flex h-14 items-center text-lg underline underline-offset-4 focus-visible:outline-4 focus-visible:outline-offset-3 focus-visible:outline-accion"
+          >
+            ← Volver a lotes
+          </Link>
           <h1 className="font-headline text-3xl font-bold uppercase">Lote {lote.codigo}</h1>
           <span className="text-on-surface-variant text-sm uppercase">{lote.estado}</span>
         </div>

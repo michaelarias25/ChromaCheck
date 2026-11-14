@@ -1,10 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { CLASES_ELEMENTO_ENCABEZADO } from './Navegacion';
 
-// Cierra la sesión y vuelve a la pantalla de login
+// Cierra la sesión y vuelve a la pantalla de login. En /login no se muestra
 export default function BotonCerrarSesion() {
   const router = useRouter();
+  const ruta = usePathname();
 
   async function cerrarSesion() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -12,12 +14,10 @@ export default function BotonCerrarSesion() {
     router.refresh();
   }
 
+  if (ruta === '/login') return null;
+
   return (
-    <button
-      type="button"
-      onClick={cerrarSesion}
-      className="px-4 h-9 bg-surface-container-high text-on-surface-variant flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider transition hover:opacity-90"
-    >
+    <button type="button" onClick={cerrarSesion} className={CLASES_ELEMENTO_ENCABEZADO}>
       Cerrar sesión
     </button>
   );

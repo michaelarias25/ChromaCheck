@@ -31,12 +31,12 @@ Pendientes:
 - [x] El código fuente de la página (Ver código fuente) ya trae `data-tema` en `<html>`.
 - [ ] El control y el tema elegido se ven en `/login`, `/`, `/lotes/[id]` y `/historial`.
 - [ ] La pantalla completa de captura usa el tema elegido.
-- [ ] Con fondo claro, el encabezado es blanco y muestra el logo de letras negras.
-- [ ] Con fondo oscuro, el encabezado es `#101418` y muestra el logo de letras blancas.
-- [ ] En los dos temas, el encabezado tiene un borde inferior de 2 px.
+- [x] Con fondo claro, el encabezado es blanco y muestra el logo de letras negras.
+- [x] Con fondo oscuro, el encabezado es `#101418` y muestra el logo de letras blancas.
+- [x] En los dos temas, el encabezado tiene un borde inferior de 2 px.
 - [ ] Al pulsar "Claro" u "Oscuro", el logo cambia sin recargar la página.
 - [ ] Al recargar, no aparece el logo del otro tema ni por un instante.
-- [ ] En `/login`, sin sesión, el logo se ve en los dos temas (no aparece una imagen rota).
+- [x] En `/login`, sin sesión, el logo se ve en los dos temas (no aparece una imagen rota).
 - [ ] El cuadro de color de un tarro muestra el mismo hex en los dos temas.
 - [ ] Un cuadro de color oscuro (por ejemplo `#101418`) se distingue del fondo oscuro gracias a su borde.
 - [ ] Con la herramienta de contraste del navegador, todo el texto da 7:1 o más en los dos temas.
