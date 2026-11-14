@@ -47,7 +47,7 @@ export default async function PlantillaPrincipal({ children }: LayoutProps<'/'>)
             <Image
               src="/logo-negro.png"
               alt="Chroma Check Logo"
-              width={40}
+              width={142}
               height={40}
               preload={tema === 'claro'}
               className="h-full w-auto object-contain oscuro:hidden"

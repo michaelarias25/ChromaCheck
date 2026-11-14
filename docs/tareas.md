@@ -52,5 +52,5 @@ Migración visual (rama `feature/migracion-visual`), en este orden: 2.1 → 6.3 
 
 - [x] 6.1 `app/layout.tsx` usa `/logo.png`: usar `logo-negro.png` con fondo claro y `logo-blanco.png` con fondo oscuro
 - [x] 6.2 Excluir `logo-blanco.png` y `logo-negro.png` en el `matcher` de `proxy.ts` para que el logo se vea en `/login` sin sesión
-- [ ] 6.3 Recortar `public/logo-negro.png` a la misma proporción que `logo-blanco.png` (1920 × 540) con `sharp` (ya viene con Next, sin dependencias nuevas) y dejarlo en 142 × 40 en `app/layout.tsx`
+- [x] 6.3 Recortar `public/logo-negro.png` a la misma proporción que `logo-blanco.png` (1920 × 540) con `sharp` (ya viene con Next, sin dependencias nuevas) y dejarlo en 142 × 40 en `app/layout.tsx`
 - [ ] 6.4 Selector "Fondo:" con los botones "Claro" y "Oscuro" en el encabezado (`app/componentes/SelectorTema.tsx`): "✓" y `aria-pressed` en el elegido, cookie `tema` por 1 año y cambio de `data-tema` sin recargar
