@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-// Aspecto de los elementos del encabezado: 56 px de alto, 18 px, sin mayúsculas sostenidas
-export const CLASES_ELEMENTO_ENCABEZADO =
-  'inline-flex h-14 items-center justify-center rounded-lg border-2 border-borde px-4 text-lg text-texto transition hover:border-texto focus-visible:outline-4 focus-visible:outline-offset-3 focus-visible:outline-accion';
+// Aspecto de los elementos del encabezado: 56 px de alto, 18 px, sin mayúsculas sostenidas.
+// Los colores van aparte para que un elemento nunca lleve dos clases de color que compitan
+export const CLASES_BASE_ENCABEZADO =
+  'inline-flex h-14 items-center justify-center rounded-lg border-2 px-4 text-lg transition focus-visible:outline-4 focus-visible:outline-offset-3 focus-visible:outline-accion';
+
+export const CLASES_ELEMENTO_ENCABEZADO = `${CLASES_BASE_ENCABEZADO} border-borde text-texto hover:border-texto`;
 
 const ENLACES = [
   { destino: '/', texto: 'Lotes' },
@@ -33,9 +36,11 @@ export default function Navegacion() {
             href={destino}
             aria-current={esActual ? 'page' : undefined}
             // El enlace actual se marca con subrayado de 4 px y negrita, no solo con color
-            className={`${CLASES_ELEMENTO_ENCABEZADO} ${
-              esActual ? 'border-texto font-bold underline decoration-4 underline-offset-8' : ''
-            }`}
+            className={
+              esActual
+                ? `${CLASES_BASE_ENCABEZADO} border-texto text-texto font-bold underline decoration-4 underline-offset-8`
+                : CLASES_ELEMENTO_ENCABEZADO
+            }
           >
             {texto}
           </Link>

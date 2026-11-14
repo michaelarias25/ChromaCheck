@@ -5,6 +5,8 @@ import './globals.css';
 import Image from 'next/image';
 import BotonCerrarSesion from './componentes/BotonCerrarSesion';
 import Navegacion from './componentes/Navegacion';
+import SelectorTema from './componentes/SelectorTema';
+import { leerTema, NOMBRE_COOKIE_TEMA } from '@/lib/tema';
 
 // Fuente de identidad-visual.md: 400 para texto, 700 para títulos y botones
 const atkinson = Atkinson_Hyperlegible_Next({
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
 
 export default async function PlantillaPrincipal({ children }: LayoutProps<'/'>) {
   // El tema llega en el HTML desde el servidor para que la página no parpadee al cargar (F7)
-  const tema = (await cookies()).get('tema')?.value === 'oscuro' ? 'oscuro' : 'claro';
+  const tema = leerTema((await cookies()).get(NOMBRE_COOKIE_TEMA)?.value);
 
   return (
     <html
@@ -65,8 +67,9 @@ export default async function PlantillaPrincipal({ children }: LayoutProps<'/'>)
 
           <Navegacion />
 
-          {/* "Cerrar sesión" va a la derecha, separado de la navegación */}
+          {/* "Fondo:" y "Cerrar sesión" van a la derecha, separados de la navegación */}
           <div className="ml-auto flex flex-wrap items-center gap-4">
+            <SelectorTema temaInicial={tema} />
             <BotonCerrarSesion />
           </div>
         </header>
