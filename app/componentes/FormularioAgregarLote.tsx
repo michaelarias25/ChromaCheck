@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LONGITUD_MAXIMA_CODIGO_LOTE } from '@/lib/validacion';
+import Boton from './Boton';
 
 // Botón "Agregar lote" que abre un formulario para crear un lote con su código
 export default function FormularioAgregarLote() {
@@ -40,7 +41,9 @@ export default function FormularioAgregarLote() {
       // Vuelve a consultar los lotes en el servidor para que aparezca la tarjeta nueva
       router.refresh();
     } catch {
-      setMensajeError('No se pudo conectar con el servidor');
+      setMensajeError(
+        'No se pudo conectar con el servidor. Revise la conexión e intente de nuevo.'
+      );
     } finally {
       setEstaEnviando(false);
     }
@@ -48,56 +51,47 @@ export default function FormularioAgregarLote() {
 
   if (!estaAbierto) {
     return (
-      <button
-        type="button"
-        onClick={() => setEstaAbierto(true)}
-        className="px-5 h-10 rounded bg-primary-container text-on-primary-container font-headline text-xs uppercase tracking-wider transition hover:opacity-90"
-      >
+      <Boton esGrande onClick={() => setEstaAbierto(true)}>
         Agregar lote
-      </button>
+      </Boton>
     );
   }
 
   return (
     <form
       onSubmit={crearLote}
-      className="w-full max-w-md bg-surface-container rounded-lg shadow-md p-5 space-y-4"
+      className="w-full max-w-md space-y-4 rounded-lg border-2 border-borde bg-superficie p-6"
     >
-      <label className="block space-y-1">
-        <span className="text-xs uppercase text-on-surface-variant">Código del lote</span>
+      <div className="space-y-2">
+        <label htmlFor="codigo-lote" className="block text-base font-bold">
+          Código del lote
+        </label>
         <input
+          id="codigo-lote"
           type="text"
           value={codigo}
           onChange={(evento) => setCodigo(evento.target.value)}
           maxLength={LONGITUD_MAXIMA_CODIGO_LOTE}
           placeholder="#005_Azul_Cielo"
           autoFocus
-          className="w-full h-10 px-3 rounded bg-surface-container-high text-on-surface outline-none focus:ring-2 focus:ring-secondary"
+          className="h-14 w-full rounded-lg border-2 border-borde bg-superficie px-4 text-lg text-texto focus-visible:outline-4 focus-visible:outline-offset-3 focus-visible:outline-accion"
         />
-      </label>
+      </div>
 
       {mensajeError && (
-        <p role="alert" className="text-sm text-primary">
+        <p role="alert" className="text-lg text-peligro">
+          <span aria-hidden="true">⚠ </span>
           {mensajeError}
         </p>
       )}
 
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={estaEnviando}
-          className="flex-1 h-10 rounded bg-primary-container text-on-primary-container font-headline text-xs uppercase tracking-wider transition hover:opacity-90 disabled:opacity-50"
-        >
-          {estaEnviando ? 'Creando...' : 'Crear lote'}
-        </button>
-        <button
-          type="button"
-          onClick={cerrarFormulario}
-          disabled={estaEnviando}
-          className="flex-1 h-10 rounded bg-surface-container-high text-on-surface-variant font-headline text-xs uppercase tracking-wider transition hover:opacity-90 disabled:opacity-50"
-        >
+      <div className="flex flex-wrap gap-4">
+        <Boton type="submit" estaEnviando={estaEnviando} textoEnviando="Creando…">
+          Crear lote
+        </Boton>
+        <Boton variante="secundario" onClick={cerrarFormulario} disabled={estaEnviando}>
           Cancelar
-        </button>
+        </Boton>
       </div>
     </form>
   );

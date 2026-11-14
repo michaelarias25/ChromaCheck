@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { connection } from 'next/server';
+import { formatearDeltaE } from '@/lib/formato';
 import type { ModoCaptura } from '@/lib/modulos/lotes/reglas';
 import { obtenerLotesConResumen } from '@/lib/modulos/lotes/servicio';
+import { obtenerClasesBoton } from './componentes/Boton';
+import CuadroColor from './componentes/CuadroColor';
 import FormularioAgregarLote from './componentes/FormularioAgregarLote';
 
 interface LoteConResumen {
@@ -16,8 +19,8 @@ interface LoteConResumen {
 // Texto del indicador de la tarjeta cuando el lote está usando el sensor; sin indicador si está Inactivo
 const TEXTOS_MODO_CAPTURA: Record<ModoCaptura, string | null> = {
   Inactivo: null,
-  Muestra: 'Esperando muestra',
-  Recoleccion: 'Recolectando lecturas',
+  Muestra: 'Esperando muestra patrón',
+  Recoleccion: 'Revisando tarros',
 };
 
 // Pantalla principal: muestra todos los lotes en producción
@@ -27,88 +30,64 @@ export default async function PaginaPrincipal() {
   const lotes = await obtenerLotesConResumen();
 
   return (
-    <main className="min-h-screen bg-surface text-on-surface">
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
-          <h1 className="font-headline text-3xl font-bold uppercase">Lotes en Producción Actual</h1>
-          <FormularioAgregarLote />
-        </div>
+    <main className="flex-1 bg-fondo text-texto">
+      <section className="mx-auto max-w-300 space-y-6 px-4 py-10 sm:px-8">
+        <h1 className="text-3xl font-bold">Lotes en producción</h1>
+        {/* Acción principal de la pantalla, debajo del título */}
+        <FormularioAgregarLote />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {lotes.map((lote: LoteConResumen) => (
-            <TarjetaLote key={lote.id} lote={lote} />
-          ))}
-        </div>
+        {lotes.length === 0 ? (
+          <p className="text-lg text-texto-secundario">Todavía no hay lotes</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {lotes.map((lote: LoteConResumen) => (
+              <TarjetaLote key={lote.id} lote={lote} />
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );
 }
 
-// Una tarjeta individual de lote
+// Una tarjeta de lote: lo más visible es el código, el color de la muestra patrón y "Abrir lote"
 function TarjetaLote({ lote }: { lote: LoteConResumen }) {
-  const colorMuestra = lote.muestra_hex || '#555555';
-  const desviacion = lote.desviacion_promedio ?? '—';
   const estaPausado = lote.estado === 'Pausado';
   const textoCaptura = TEXTOS_MODO_CAPTURA[lote.modo_captura];
 
   return (
-    <article className="bg-surface-container rounded-lg overflow-hidden shadow-md">
-      <div className="p-5 flex items-center justify-between bg-surface-container-high">
-        <div>
-          <span className="text-xs uppercase text-on-surface-variant block">ID Lote</span>
-          <span className="font-headline text-lg font-bold">{lote.codigo}</span>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <span
-            className={`px-3 py-1 text-xs uppercase rounded ${
-              estaPausado
-                ? 'bg-primary-container text-on-primary-container'
-                : 'bg-secondary-container text-secondary-fixed'
-            }`}
-          >
-            {lote.estado}
+    <article className="space-y-4 rounded-lg border-2 border-borde bg-superficie p-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-2xl font-bold break-all">{lote.codigo}</h2>
+        {estaPausado ? (
+          <span className="text-lg font-bold text-peligro">
+            <span aria-hidden="true">⚠ </span>Pausado
           </span>
-          {textoCaptura && (
-            <span className="px-3 py-1 text-xs uppercase rounded font-bold bg-tertiary-container text-on-tertiary-container">
-              <span aria-hidden="true">● </span>
-              {textoCaptura}
-            </span>
-          )}
-        </div>
+        ) : (
+          <span className="text-base text-texto-secundario">{lote.estado}</span>
+        )}
       </div>
 
-      <div className="p-5 space-y-4">
-        <div
-          className="w-full h-36 rounded-md flex items-end justify-between p-3"
-          style={{ backgroundColor: colorMuestra }}
-        >
-          <span className="bg-surface-container-lowest/80 px-2 py-0.5 rounded text-xs uppercase">
-            Muestra Real
-          </span>
-          <span className="bg-surface-container-lowest/80 px-2 py-0.5 rounded text-xs">
-            Ref. {colorMuestra}
-          </span>
-        </div>
+      <CuadroColor hex={lote.muestra_hex} textoSinColor="Sin muestra patrón" />
 
-        <div className="bg-surface-container-low p-4 rounded flex items-center justify-between">
-          <div>
-            <span className="text-xs uppercase text-on-surface-variant block">
-              Desviación Promedio
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-4xl font-bold">{desviacion}</span>
-              <span className="text-sm text-on-surface-variant">ΔE</span>
-            </div>
-          </div>
-        </div>
-
-        <Link
-          href={`/lotes/${lote.id}`}
-          className="w-full h-14 bg-primary-container text-on-primary-container flex items-center justify-center rounded font-headline uppercase tracking-wider"
-        >
-          Ver Monitoreo de Lote
-        </Link>
+      <div className="space-y-1 text-base text-texto-secundario">
+        <p className="tabular-nums">
+          Diferencia de color promedio: {formatearDeltaE(lote.desviacion_promedio)} ΔE
+        </p>
+        {textoCaptura && (
+          <p>
+            <span aria-hidden="true">● </span>
+            {textoCaptura}
+          </p>
+        )}
       </div>
+
+      <Link
+        href={`/lotes/${lote.id}`}
+        className={`${obtenerClasesBoton({ variante: 'secundario' })} w-full`}
+      >
+        Abrir lote
+      </Link>
     </article>
   );
 }

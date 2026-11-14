@@ -13,7 +13,7 @@ Pantalla `/`. API: `GET /api/lotes`, `POST /api/lotes` ([contratos/api.md](../co
 1. La pantalla muestra los lotes del más reciente al más antiguo, uno por tarjeta.
 2. Cada tarjeta muestra el código, el estado (Activo o Pausado), el color de la muestra patrón, la desviación promedio y si el lote está usando el sensor.
 3. "Agregar lote" abre un formulario con el código; al crearlo, la tarjeta nueva aparece en la lista.
-4. "Abrir lote" en la tarjeta (hoy "Ver Monitoreo de Lote") lleva a la pantalla del lote (F3, F4, F5).
+4. "Abrir lote" en la tarjeta lleva a la pantalla del lote (F3, F4, F5).
 
 ## Criterios de aceptación
 
@@ -27,13 +27,13 @@ Ya en `development`:
 
 Pendientes (identidad visual):
 
-- [ ] "Agregar lote" es el botón principal de la pantalla (72 px), debajo del título.
-- [ ] Los textos de la tarjeta usan 16 px como mínimo y sin mayúsculas sostenidas; los textos de captura usan las palabras nuevas ("Esperando muestra patrón", "Revisando tarros").
-- [ ] El estado Pausado se distingue con "⚠ Pausado" en rojo, no solo con el color.
-- [ ] El cuadro de color tiene borde y su código hex va debajo, no encima del color.
-- [ ] El enlace de la tarjeta dice "Abrir lote", en texto normal (sin mayúsculas sostenidas).
-- [ ] Sin lotes, la pantalla dice "Todavía no hay lotes" y muestra el botón "Agregar lote".
-- [ ] En la tarjeta, el código, el cuadro de color y "Abrir lote" son lo más visible; la desviación promedio y el estado del sensor van en texto secundario de 16 px.
+- [x] "Agregar lote" es el botón principal de la pantalla (72 px), debajo del título.
+- [x] Los textos de la tarjeta usan 16 px como mínimo y sin mayúsculas sostenidas; los textos de captura usan las palabras nuevas ("Esperando muestra patrón", "Revisando tarros").
+- [x] El estado Pausado se distingue con "⚠ Pausado" en rojo, no solo con el color.
+- [x] El cuadro de color tiene borde y su código hex va debajo, no encima del color.
+- [x] El enlace de la tarjeta dice "Abrir lote", en texto normal (sin mayúsculas sostenidas).
+- [x] Sin lotes, la pantalla dice "Todavía no hay lotes" y muestra el botón "Agregar lote".
+- [x] En la tarjeta, el código, el cuadro de color y "Abrir lote" son lo más visible; la desviación promedio y el estado del sensor van en texto secundario de 16 px.
 
 ## Fuera de alcance
 
