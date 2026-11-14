@@ -28,7 +28,7 @@ Pendientes:
 - [ ] Al pulsar "Oscuro", el fondo cambia sin recargar la página.
 - [ ] Después de elegir "Oscuro", la cookie `tema` vale `oscuro` y vence en 1 año.
 - [ ] Al recargar con fondo oscuro, la página no muestra el fondo claro ni por un instante.
-- [ ] El código fuente de la página (Ver código fuente) ya trae `data-tema` en `<html>`.
+- [x] El código fuente de la página (Ver código fuente) ya trae `data-tema` en `<html>`.
 - [ ] El control y el tema elegido se ven en `/login`, `/`, `/lotes/[id]` y `/historial`.
 - [ ] La pantalla completa de captura usa el tema elegido.
 - [ ] Con fondo claro, el encabezado es blanco y muestra el logo de letras negras.
