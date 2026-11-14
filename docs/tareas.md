@@ -16,7 +16,7 @@ Las tareas ya terminadas antes de crear esta carpeta no se listan: su estado est
 Migración visual (rama `feature/migracion-visual`), en este orden: 2.1 → 6.3 → 2.2 → 2.3 → 2.8 → 2.4 → 6.4 → 2.5 → 2.6 → 2.7 → 2.9 → 2.10. Los tokens nuevos conviven con los antiguos hasta la 2.10.
 
 - [x] 2.1 Tokens de la paleta (tema claro y oscuro) y fuente Atkinson Hyperlegible Next en `app/globals.css` y `app/layout.tsx`; encabezado según el tema, con el logo de letras negras o blancas (F7)
-- [ ] 2.2 Componente `Boton` (`app/componentes/Boton.tsx`) con variantes principal, secundario y peligro, alto de 56 o 72 px y estado "enviando"
+- [x] 2.2 Componente `Boton` (`app/componentes/Boton.tsx`) con variantes principal, secundario y peligro, alto de 56 o 72 px y estado "enviando"
 - [ ] 2.3 Componente `CuadroColor` (`app/componentes/CuadroColor.tsx`): color de la pintura con borde y código hex debajo
 - [ ] 2.4 Encabezado y navegación según [Navegación](diseno/identidad-visual.md#navegación): "Lotes" como inicio, "Historial" como enlace secundario, "Cerrar sesión" a la derecha, todos de 56 px de alto y sin mayúsculas sostenidas; en `/login` solo el logo y "Fondo:"; "← Volver a lotes" en la pantalla del lote
 - [ ] 2.5 F1 · Pantalla de login con campos de 56 px, "Mostrar contraseña" y error visible
