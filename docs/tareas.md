@@ -43,9 +43,3 @@ Las tareas ya terminadas antes de crear esta carpeta no se listan: su estado est
 
 - [ ] 5.1 `lib/modulos/auth/servicio.ts` hace SQL: mover las consultas a `lib/modulos/auth/repositorio.ts`
 - [ ] 5.2 Proteger `POST /api/tarros` y `GET /api/captura/activa` con una clave compartida del puente (encabezado + variable de entorno), coordinado con Michael
-
-## 6. Despliegue (ver [operacion/despliegue.md](operacion/despliegue.md))
-
-- [ ] 6.1 Probar el despliegue de Next.js 16 en AWS antes de la fecha de entrega
-- [ ] 6.2 Configurar `DATABASE_URL` y `AUTH_SECRET` en la consola de AWS
-- [ ] 6.3 Verificar el login por HTTPS (la cookie de sesión es segura)
