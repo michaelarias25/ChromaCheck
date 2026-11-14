@@ -18,7 +18,7 @@ Pantalla `/lotes/[id]`. API: `PATCH /api/lotes/[id]/captura` con `{ "modo": "Rec
 
 ## Criterios de aceptación
 
-Ya en `development` (con los textos actuales "Iniciar recolección" y "Detener recolección"):
+Ya en `development`:
 
 - [x] Solo se puede pasar a modo `Recoleccion` si el lote está Activo, tiene muestra y ningún otro lote usa el sensor.
 - [x] El ΔE se calcula con CIE76 frente a la muestra patrón y se muestra con 2 decimales.

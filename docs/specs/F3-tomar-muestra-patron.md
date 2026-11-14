@@ -18,7 +18,7 @@ Pantalla `/lotes/[id]`. API: `PATCH /api/lotes/[id]/captura` con `{ "modo": "Mue
 
 ## Criterios de aceptación
 
-Ya en `development` (con el texto actual "Registrar muestra"):
+Ya en `development`:
 
 - [x] Solo se puede pasar a modo `Muestra` si el lote está Activo, no tiene muestra y ningún otro lote usa el sensor; si no, la API responde 409 con el motivo.
 - [x] Al registrarse la muestra, el lote vuelve solo a `Inactivo`.
@@ -33,7 +33,7 @@ Pendientes (pantalla completa):
 - [ ] Cerrarla devuelve el lote a `Inactivo`.
 - [ ] Al cerrarla, el foco vuelve al botón que la abrió, con el mismo texto y en el mismo lugar.
 - [ ] Al recargar la página con el lote en modo `Muestra`, la pantalla completa aparece abierta.
-- [ ] Mientras se envía el cambio de modo, el botón dice "Abriendo…" y no admite un segundo clic.
+- [x] Mientras se envía el cambio de modo, el botón dice "Abriendo…" y no admite un segundo clic.
 - [ ] Si la API rechaza el cambio, el motivo se muestra en texto de 18 px con "⚠" y lo que hay que hacer.
 - [ ] Usa `role="dialog"`, `aria-modal="true"` y `aria-labelledby` apuntando al título; el estado "Esperando el tarro…" usa `role="status"`.
 

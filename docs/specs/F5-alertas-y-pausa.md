@@ -35,7 +35,7 @@ Pendientes (identidad visual):
 
 - [ ] Estados dorado y rojo de la pantalla completa, con "⚠" y palabra.
 - [ ] La alerta roja no se cierra sola: espera "Reanudar revisión" o "Entendido".
-- [ ] Alertas de la lista con 18 px, nivel escrito ("Alerta roja", "Alerta amarilla") y hora.
+- [x] Alertas de la lista con 18 px, nivel escrito ("Alerta roja", "Alerta amarilla") y hora.
 
 Pendientes (reanudar el lote):
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ModoCaptura } from '@/lib/modulos/lotes/reglas';
+import Boton from './Boton';
 
 // Cada cuánto se vuelve a consultar la página mientras el lote está capturando
 const INTERVALO_REFRESCO_MS = 3000;
@@ -22,7 +23,8 @@ interface PropiedadesControlCaptura {
   capturaDeOtroLote: CapturaDeOtroLote | null;
 }
 
-// Botones para decidir si el sensor registra la muestra o recolecta lecturas para este lote
+// Acción principal de la pantalla del lote: tomar la muestra patrón o revisar tarros.
+// Mientras no exista la pantalla completa (sección 3), lo que hace el sensor se muestra aquí
 export default function ControlCaptura({
   loteId,
   estado,
@@ -62,7 +64,9 @@ export default function ControlCaptura({
       }
       router.refresh();
     } catch {
-      setMensajeError('No se pudo conectar con el servidor');
+      setMensajeError(
+        'No se pudo conectar con el servidor. Revise la conexión e intente de nuevo.'
+      );
     } finally {
       setEstaEnviando(false);
     }
@@ -72,30 +76,26 @@ export default function ControlCaptura({
   if (estado !== 'Activo') return null;
 
   return (
-    <div className="bg-surface-container rounded-lg overflow-hidden">
-      <h2 className="bg-surface-container-high px-4 py-3 text-xs uppercase">Captura del Sensor</h2>
+    <div className="space-y-4">
+      <ContenidoCaptura
+        modoCaptura={modoCaptura}
+        tieneMuestra={tieneMuestra}
+        capturaDeOtroLote={capturaDeOtroLote}
+        estaEnviando={estaEnviando}
+        cambiarModo={cambiarModo}
+      />
 
-      <div className="p-5 space-y-4">
-        <ContenidoCaptura
-          modoCaptura={modoCaptura}
-          tieneMuestra={tieneMuestra}
-          capturaDeOtroLote={capturaDeOtroLote}
-          estaEnviando={estaEnviando}
-          cambiarModo={cambiarModo}
-        />
-
-        {mensajeError && (
-          <p role="alert" className="text-sm text-primary">
-            <span aria-hidden="true">⚠ </span>
-            {mensajeError}
-          </p>
-        )}
-      </div>
+      {mensajeError && (
+        <p role="alert" className="text-lg text-peligro">
+          <span aria-hidden="true">⚠ </span>
+          {mensajeError}
+        </p>
+      )}
     </div>
   );
 }
 
-// Elige el indicador y los botones según el modo del lote y si el sensor está libre
+// Elige el estado del sensor y el botón según el modo del lote y si el sensor está libre
 function ContenidoCaptura({
   modoCaptura,
   tieneMuestra,
@@ -112,14 +112,17 @@ function ContenidoCaptura({
   if (modoCaptura === 'Muestra') {
     return (
       <>
-        <IndicadorEstado texto="Esperando la muestra" estaActivo />
-        <p className="font-headline text-lg">Coloca el tarro muestra frente al sensor</p>
-        <BotonCaptura
-          texto="Cancelar"
-          esSecundario
-          estaDeshabilitado={estaEnviando}
-          alPulsar={() => cambiarModo('Inactivo')}
-        />
+        <EstadoSensor texto="Esperando el tarro…" estaActivo />
+        <p className="text-2xl font-bold">Coloque el tarro patrón frente al sensor</p>
+        <Boton
+          variante="secundario"
+          esGrande
+          estaEnviando={estaEnviando}
+          textoEnviando="Cancelando…"
+          onClick={() => cambiarModo('Inactivo')}
+        >
+          Cancelar
+        </Boton>
       </>
     );
   }
@@ -127,101 +130,65 @@ function ContenidoCaptura({
   if (modoCaptura === 'Recoleccion') {
     return (
       <>
-        <IndicadorEstado texto="Recolectando lecturas" estaActivo />
-        <BotonCaptura
-          texto="Detener recolección"
-          esSecundario
-          estaDeshabilitado={estaEnviando}
-          alPulsar={() => cambiarModo('Inactivo')}
-        />
+        <EstadoSensor texto="Revisando tarros…" estaActivo />
+        <p className="text-2xl font-bold">Pase los tarros uno por uno frente al sensor</p>
+        <Boton
+          variante="peligro"
+          esGrande
+          estaEnviando={estaEnviando}
+          textoEnviando="Terminando…"
+          onClick={() => cambiarModo('Inactivo')}
+        >
+          Terminar revisión
+        </Boton>
       </>
     );
   }
 
-  // Modo Inactivo
-  const textoEstado = tieneMuestra ? 'Detenido' : 'Sin muestra registrada';
-
-  if (capturaDeOtroLote) {
-    return (
-      <>
-        <IndicadorEstado texto={textoEstado} estaActivo={false} />
-        <p className="text-sm">
-          El sensor está ocupado: el lote{' '}
-          <Link
-            href={`/lotes/${capturaDeOtroLote.loteId}`}
-            className="font-bold underline underline-offset-2"
-          >
-            {capturaDeOtroLote.codigo}
-          </Link>{' '}
-          está capturando en modo {capturaDeOtroLote.modo}. Detén esa captura para usar el sensor en
-          este lote.
-        </p>
-      </>
-    );
-  }
+  // Modo Inactivo: la acción principal depende de si el lote ya tiene muestra patrón
+  const textoAccion = tieneMuestra ? 'Revisar tarros' : 'Tomar muestra patrón';
+  const modoSiguiente: ModoCaptura = tieneMuestra ? 'Recoleccion' : 'Muestra';
 
   return (
     <>
-      <IndicadorEstado texto={textoEstado} estaActivo={false} />
-      {tieneMuestra ? (
-        <BotonCaptura
-          texto="Iniciar recolección"
-          estaDeshabilitado={estaEnviando}
-          alPulsar={() => cambiarModo('Recoleccion')}
-        />
-      ) : (
-        <BotonCaptura
-          texto="Registrar muestra"
-          estaDeshabilitado={estaEnviando}
-          alPulsar={() => cambiarModo('Muestra')}
-        />
+      <div className="flex flex-wrap items-center gap-4">
+        <Boton
+          esGrande
+          disabled={Boolean(capturaDeOtroLote)}
+          estaEnviando={estaEnviando}
+          textoEnviando="Abriendo…"
+          onClick={() => cambiarModo(modoSiguiente)}
+        >
+          {textoAccion}
+        </Boton>
+        <EstadoSensor texto="El sensor está detenido" estaActivo={false} />
+      </div>
+
+      {/* El botón deshabilitado lleva al lado la frase que explica por qué */}
+      {capturaDeOtroLote && (
+        <p className="text-lg">
+          <span aria-hidden="true">⚠ </span>El sensor está ocupado con el lote{' '}
+          <Link
+            href={`/lotes/${capturaDeOtroLote.loteId}`}
+            className="font-bold text-accion underline underline-offset-4"
+          >
+            {capturaDeOtroLote.codigo}
+          </Link>
+          . Termine esa revisión para usarlo aquí.
+        </p>
       )}
     </>
   );
 }
 
-// Estado de la captura en texto; el símbolo y el color solo lo refuerzan
-function IndicadorEstado({ texto, estaActivo }: { texto: string; estaActivo: boolean }) {
+// Estado del sensor en texto; el símbolo solo lo refuerza
+function EstadoSensor({ texto, estaActivo }: { texto: string; estaActivo: boolean }) {
   return (
-    <p role="status" className="flex items-center gap-2 text-sm uppercase">
-      <span className="text-on-surface-variant">Estado:</span>
-      <span
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded font-bold ${
-          estaActivo
-            ? 'bg-secondary-container text-secondary-fixed'
-            : 'bg-surface-container-highest text-on-surface-variant'
-        }`}
-      >
-        <span aria-hidden="true">{estaActivo ? '●' : '■'}</span>
-        {texto}
+    <p role="status" className="text-lg">
+      <span aria-hidden="true" className={estaActivo ? 'text-accion' : 'text-texto-secundario'}>
+        {estaActivo ? '● ' : '■ '}
       </span>
+      {texto}
     </p>
-  );
-}
-
-function BotonCaptura({
-  texto,
-  esSecundario = false,
-  estaDeshabilitado,
-  alPulsar,
-}: {
-  texto: string;
-  esSecundario?: boolean;
-  estaDeshabilitado: boolean;
-  alPulsar: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={alPulsar}
-      disabled={estaDeshabilitado}
-      className={`px-5 h-10 rounded font-headline text-xs uppercase tracking-wider transition hover:opacity-90 disabled:opacity-50 ${
-        esSecundario
-          ? 'bg-surface-container-high text-on-surface'
-          : 'bg-primary-container text-on-primary-container'
-      }`}
-    >
-      {estaDeshabilitado ? 'Enviando...' : texto}
-    </button>
   );
 }
