@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { formatearDeltaE } from '@/lib/formato';
 import { obtenerHistorialTarros } from '@/lib/modulos/tarros/servicio';
+import { obtenerClasesBoton } from '../componentes/Boton';
+import CuadroColor from '../componentes/CuadroColor';
 import InsigniaResultado from '../componentes/InsigniaResultado';
 
 const TARROS_POR_PAGINA = 6;
@@ -36,20 +38,19 @@ export default async function PaginaHistorial({ searchParams }: PageProps<'/hist
   }
 
   return (
-    <main className="min-h-screen bg-surface text-on-surface">
-      <section className="max-w-6xl mx-auto px-6 py-10">
-        <h1 className="font-headline text-3xl font-bold uppercase mb-8">
-          Historial de Calidad de Tarros
-        </h1>
+    <main className="flex-1 bg-fondo text-texto">
+      <section className="mx-auto max-w-300 space-y-6 px-4 py-10 sm:px-8">
+        <h1 className="text-3xl font-bold">Historial de tarros</h1>
 
-        <div className="bg-surface-container rounded-lg overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-surface-container-high text-xs uppercase text-on-surface-variant">
+        {/* En pantallas angostas la tabla se desplaza dentro de su recuadro, no la página */}
+        <div className="overflow-x-auto rounded-lg border-2 border-borde bg-superficie">
+          <table className="w-full text-left text-lg">
+            <thead className="border-b-2 border-borde text-base font-bold">
               <tr>
-                <th className="px-5 py-4">ID de Tarro</th>
+                <th className="px-5 py-4">Tarro</th>
                 <th className="px-5 py-4">Lote</th>
-                <th className="px-5 py-4">Color Medido</th>
-                <th className="px-5 py-4">ΔE</th>
+                <th className="px-5 py-4">Color medido</th>
+                <th className="px-5 py-4">Diferencia de color (ΔE)</th>
                 <th className="px-5 py-4">Resultado</th>
               </tr>
             </thead>
@@ -59,8 +60,8 @@ export default async function PaginaHistorial({ searchParams }: PageProps<'/hist
               ))}
               {tarros.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-on-surface-variant">
-                    Aún no hay tarros registrados.
+                  <td colSpan={5} className="px-5 py-8 text-center text-texto-secundario">
+                    Todavía no hay tarros revisados.
                   </td>
                 </tr>
               )}
@@ -86,15 +87,18 @@ function ControlesPaginacion({
   const tienePaginaSiguiente = paginaActual < totalPaginas;
 
   return (
-    <nav className="mt-6 flex items-center justify-between" aria-label="Paginación del historial">
+    <nav
+      className="flex flex-wrap items-center justify-between gap-4"
+      aria-label="Paginación del historial"
+    >
       <BotonPaginacion
         destino={`/historial?pagina=${paginaActual - 1}`}
         estaHabilitado={tienePaginaAnterior}
       >
-        Anterior
+        ← Página anterior
       </BotonPaginacion>
 
-      <span className="text-sm text-on-surface-variant uppercase">
+      <span className="text-lg">
         Página {paginaActual} de {totalPaginas}
       </span>
 
@@ -102,7 +106,7 @@ function ControlesPaginacion({
         destino={`/historial?pagina=${paginaActual + 1}`}
         estaHabilitado={tienePaginaSiguiente}
       >
-        Siguiente
+        Página siguiente →
       </BotonPaginacion>
     </nav>
   );
@@ -118,25 +122,18 @@ function BotonPaginacion({
   estaHabilitado: boolean;
   children: ReactNode;
 }) {
-  const clasesBase =
-    'px-4 h-9 flex items-center justify-center rounded font-headline text-xs uppercase tracking-wider';
+  const clases = obtenerClasesBoton({ variante: 'secundario' });
 
   if (!estaHabilitado) {
     return (
-      <span
-        className={`${clasesBase} bg-surface-container text-on-surface-variant opacity-50 cursor-not-allowed`}
-        aria-disabled="true"
-      >
+      <span className={`${clases} cursor-not-allowed opacity-60`} aria-disabled="true">
         {children}
       </span>
     );
   }
 
   return (
-    <Link
-      href={destino}
-      className={`${clasesBase} bg-surface-container-high text-on-surface transition hover:bg-surface-container-highest`}
-    >
+    <Link href={destino} className={clases}>
       {children}
     </Link>
   );
@@ -145,20 +142,13 @@ function BotonPaginacion({
 // Una fila individual del historial
 function FilaTarro({ tarro }: { tarro: FilaHistorialTarro }) {
   return (
-    <tr className="border-t border-surface-container-highest">
+    <tr className="border-t-2 border-borde first:border-t-0">
       <td className="px-5 py-4">#TR-{tarro.id_tarro}</td>
       <td className="px-5 py-4">{tarro.lote_codigo}</td>
       <td className="px-5 py-4">
-        <div className="flex items-center gap-2">
-          <span
-            className="w-6 h-6 rounded"
-            aria-hidden="true"
-            style={{ backgroundColor: tarro.resultado_hex }}
-          />
-          {tarro.resultado_hex}
-        </div>
+        <CuadroColor hex={tarro.resultado_hex} tamano="pequeno" />
       </td>
-      <td className="px-5 py-4 text-xl font-bold tabular-nums">
+      <td className="px-5 py-4 font-bold tabular-nums">
         {formatearDeltaE(tarro.desviacion_delta_e)}
       </td>
       <td className="px-5 py-4">

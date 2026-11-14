@@ -25,9 +25,9 @@ Ya en `development`:
 
 Pendientes (identidad visual):
 
-- [ ] Encabezados de tabla en 16 px negrita, sin mayúsculas sostenidas; filas en 18 px.
-- [ ] Botones "Página anterior" y "Página siguiente" de 56 px con texto, y "Página 2 de 5" visible.
-- [ ] El cuadro del color medido mide al menos 32 px y tiene borde.
+- [x] Encabezados de tabla en 16 px negrita, sin mayúsculas sostenidas; filas en 18 px.
+- [x] Botones "Página anterior" y "Página siguiente" de 56 px con texto, y "Página 2 de 5" visible.
+- [x] El cuadro del color medido mide al menos 32 px y tiene borde.
 
 ## Fuera de alcance
 

@@ -21,7 +21,7 @@ Migración visual (rama `feature/migracion-visual`), en este orden: 2.1 → 6.3 
 - [x] 2.4 Encabezado y navegación según [Navegación](diseno/identidad-visual.md#navegación): "Lotes" como inicio, "Historial" como enlace secundario, "Cerrar sesión" a la derecha, todos de 56 px de alto y sin mayúsculas sostenidas; en `/login` solo el logo y "Fondo:"; "← Volver a lotes" en la pantalla del lote
 - [x] 2.5 F1 · Pantalla de login con campos de 56 px, "Mostrar contraseña" y error visible
 - [x] 2.6 F2 · Pantalla de lotes: botón principal "Agregar lote", tarjetas con 16 px mínimo donde destacan el código, el color y "Abrir lote", "⚠ Pausado", estado vacío
-- [ ] 2.7 F6 · Historial: tabla en 18 px y paginación con botones de 56 px
+- [x] 2.7 F6 · Historial: tabla en 18 px y paginación con botones de 56 px
 - [x] 2.8 `InsigniaResultado` con la paleta nueva (verde, rojo) y tamaño de 18 px
 - [ ] 2.9 Pantalla del lote (`app/lotes/[id]/page.tsx` y `ControlCaptura`) con la paleta nueva, sin la pantalla completa de la sección 3: botón principal "Tomar muestra patrón" o "Revisar tarros" con "■ El sensor está detenido"; mientras espera la muestra, "● Esperando el tarro…" con "Cancelar"; mientras revisa, "● Revisando tarros…" con "Terminar revisión"; `CuadroColor` en la comparación, tabla y alertas en 18 px; textos nuevos en `README.md`
 - [ ] 2.10 Borrar los tokens antiguos (`surface-*`, `primary-*`, `secondary-*`, `tertiary-*`, `outline`) y las fuentes Inter y Montserrat
