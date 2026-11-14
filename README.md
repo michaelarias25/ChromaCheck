@@ -109,12 +109,12 @@ public/               Logo e imágenes
 
 ## Base de datos
 
-| Tabla      | Columnas                                                                                                                                                                                                                                                                                 |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tabla      | Columnas                                                                                                                                                                                                                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `lotes`    | `id`, `codigo` (único, sin distinguir mayúsculas ni espacios en los extremos; máximo 50 caracteres), `estado` (por defecto `Activo`; `Pausado` tras una alerta roja), `modo_captura` (`Inactivo` por defecto, `Muestra` o `Recoleccion`; ver [docs/contratos/api.md](docs/contratos/api.md)), `fecha_inicio` |
-| `tarros`   | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp`                                                                                                                                 |
-| `alertas`  | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp`                                                                                                                                                                           |
-| `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion`                                                                                                                                                                                                                      |
+| `tarros`   | `id_tarro`, `lote_id` → `lotes.id`, `resultado_hex`, `desviacion_delta_e`, `resultado` (`Muestra`, `Aprobado`, `No Aprobado`), `es_muestra`, `timestamp`                                                                                                                                                     |
+| `alertas`  | `id`, `tarro_id` → `tarros.id_tarro`, `nivel` (`Amarilla`, `Roja`), `mensaje`, `congela_registro`, `timestamp`                                                                                                                                                                                               |
+| `usuarios` | `id`, `nombre_usuario` (único), `contrasena_hash`, `fecha_creacion`                                                                                                                                                                                                                                          |
 
 El código único de `lotes` se garantiza con este índice (probado primero en el SQL Editor de Neon):
 
