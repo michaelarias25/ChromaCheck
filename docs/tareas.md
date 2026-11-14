@@ -17,7 +17,7 @@ Migración visual (rama `feature/migracion-visual`), en este orden: 2.1 → 6.3 
 
 - [x] 2.1 Tokens de la paleta (tema claro y oscuro) y fuente Atkinson Hyperlegible Next en `app/globals.css` y `app/layout.tsx`; encabezado según el tema, con el logo de letras negras o blancas (F7)
 - [x] 2.2 Componente `Boton` (`app/componentes/Boton.tsx`) con variantes principal, secundario y peligro, alto de 56 o 72 px y estado "enviando"
-- [ ] 2.3 Componente `CuadroColor` (`app/componentes/CuadroColor.tsx`): color de la pintura con borde y código hex debajo
+- [x] 2.3 Componente `CuadroColor` (`app/componentes/CuadroColor.tsx`): color de la pintura con borde y código hex debajo
 - [ ] 2.4 Encabezado y navegación según [Navegación](diseno/identidad-visual.md#navegación): "Lotes" como inicio, "Historial" como enlace secundario, "Cerrar sesión" a la derecha, todos de 56 px de alto y sin mayúsculas sostenidas; en `/login` solo el logo y "Fondo:"; "← Volver a lotes" en la pantalla del lote
 - [ ] 2.5 F1 · Pantalla de login con campos de 56 px, "Mostrar contraseña" y error visible
 - [ ] 2.6 F2 · Pantalla de lotes: botón principal "Agregar lote", tarjetas con 16 px mínimo donde destacan el código, el color y "Abrir lote", "⚠ Pausado", estado vacío
