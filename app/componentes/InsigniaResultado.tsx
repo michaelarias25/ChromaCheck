@@ -12,17 +12,17 @@ const ESTILOS_RESULTADO: Record<TipoResultado, { texto: string; simbolo: string;
     aprobado: {
       texto: 'Aprobado',
       simbolo: '✓',
-      clases: 'bg-secondary-container text-secondary-fixed',
+      clases: 'bg-aprobado text-texto-sobre-aprobado border-aprobado',
     },
     noAprobado: {
       texto: 'No aprobado',
       simbolo: '✕',
-      clases: 'bg-primary-container text-on-primary-container',
+      clases: 'bg-peligro text-texto-sobre-peligro border-peligro',
     },
     sinCalcular: {
       texto: 'Sin calcular',
       simbolo: '–',
-      clases: 'bg-surface-container-highest text-on-surface-variant',
+      clases: 'bg-superficie text-texto-secundario border-borde',
     },
   };
 
@@ -47,7 +47,7 @@ export default function InsigniaResultado({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs uppercase font-bold whitespace-nowrap ${estilo.clases}`}
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border-2 text-lg font-bold whitespace-nowrap ${estilo.clases}`}
     >
       <span aria-hidden="true">{estilo.simbolo}</span>
       {estilo.texto}
